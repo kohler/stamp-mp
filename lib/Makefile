@@ -25,8 +25,8 @@ SRCS := \
         rbtree.c \
 	thread.c \
 	tm.c \
-	tmalloc.c \
 	vector.c \
+#	tmalloc.c \
 #
 OBJS := ${SRCS:.c=.o}
 
@@ -40,8 +40,8 @@ PROG_TEST := \
 	test_random \
         test_rbtree \
 	test_thread \
-	test_tmalloc \
 	test_vector \
+#	test_tmalloc \
 #
 
 RM := rm -f
@@ -104,10 +104,10 @@ test_thread: CFLAGS += -DTEST_THREAD
 test_thread:
 	$(CC) $(CFLAGS) thread.c -lpthread -o $@
 
-.PHONY: test_tmalloc
-test_tmalloc: CFLAGS += -DTEST_TMALLOC
-test_tmalloc:
-	$(CC) $(CFLAGS) tmalloc.c -o $@
+#.PHONY: test_tmalloc
+#test_tmalloc: CFLAGS += -DTEST_TMALLOC
+#test_tmalloc:
+#	$(CC) $(CFLAGS) tmalloc.c -o $@
 
 .PHONY: test_vector
 test_vector: CFLAGS += -DTEST_VECTOR
