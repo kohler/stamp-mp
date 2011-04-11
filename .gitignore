@@ -1,0 +1,17 @@
+*~
+*.o
+bayes/bayes
+genome/genome
+intruder/intruder
+kmeans/kmeans
+labyrinth/labyrinth
+lib/test_bitmap
+lib/test_hashtable
+lib/test_list
+lib/test_memory
+lib/test_pair
+lib/test_queue
+lib/test_random
+lib/test_rbtree
+lib/test_thread
+lib/test_vector
