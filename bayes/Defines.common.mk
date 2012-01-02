@@ -7,13 +7,7 @@
 
 PROG := bayes
 
-SRCS += \
-	adtree.c \
-	bayes.c \
-	data.c \
-	learner.c \
-	net.c \
-	sort.c \
+LIB_SRCS := \
 	$(LIB)/bitmap.c \
 	$(LIB)/list.c \
 	$(LIB)/mt19937ar.c \
@@ -21,6 +15,15 @@ SRCS += \
 	$(LIB)/random.c \
 	$(LIB)/thread.c \
 	$(LIB)/vector.c \
+
+SRCS += \
+	adtree.c \
+	bayes.c \
+	data.c \
+	learner.c \
+	net.c \
+	sort.c \
+	$(LIB_SRCS)
 #
 OBJS := ${SRCS:.c=.o}
 
