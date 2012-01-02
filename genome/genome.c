@@ -228,14 +228,7 @@ MAIN (argc,argv)
     fflush(stdout);
     TIMER_READ(start);
     GOTO_SIM();
-#ifdef OTM
-#pragma omp parallel
-    {
-        sequencer_run(sequencerPtr);
-    }
-#else
     thread_start(sequencer_run, (void*)sequencerPtr);
-#endif
     GOTO_REAL();
     TIMER_READ(stop);
     puts("done.");

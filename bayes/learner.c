@@ -1480,19 +1480,8 @@ learnStructure (void* argPtr)
 void
 learner_run (learner_t* learnerPtr)
 {
-#ifdef OTM
-#pragma omp parallel
-    {
-        createTaskList((void*)learnerPtr);
-    }
-#pragma omp parallel
-    {
-        learnStructure((void*)learnerPtr);
-    }
-#else
     thread_start(&createTaskList, (void*)learnerPtr);
     thread_start(&learnStructure, (void*)learnerPtr);
-#endif
 }
 
 

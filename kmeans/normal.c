@@ -280,14 +280,7 @@ normal_exec (int       nthreads,
         global_i = nthreads * CHUNK;
         global_delta = delta;
 
-#ifdef OTM
-#pragma omp parallel
-        {
-            work(&args);
-        }
-#else
         thread_start(work, &args);
-#endif
 
         delta = global_delta;
 

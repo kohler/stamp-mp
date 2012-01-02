@@ -303,14 +303,7 @@ MAIN(argc, argv)
     TIMER_T start;
     TIMER_READ(start);
     GOTO_SIM();
-#ifdef OTM
-#pragma omp parallel
-    {
-        process();
-    }
-#else
     thread_start(process, NULL);
-#endif
     GOTO_REAL();
     TIMER_T stop;
     TIMER_READ(stop);

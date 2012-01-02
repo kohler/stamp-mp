@@ -171,14 +171,7 @@ MAIN(argc, argv)
 
 #ifdef USE_PARALLEL_DATA_GENERATION
     GOTO_SIM();
-#ifdef OTM
-#pragma omp parallel
-    {
-        genScalData((void*)SDGdata);
-    }
-#else
     thread_start(genScalData, (void*)SDGdata);
-#endif
     GOTO_REAL();
 #else /* !USE_PARALLEL_DATA_GENERATION */
     genScalData_seq(SDGdata);
@@ -215,14 +208,7 @@ MAIN(argc, argv)
     TIMER_READ(start);
 
     GOTO_SIM();
-#ifdef OTM
-#pragma omp parallel
-    {
-        computeGraph((void*)&computeGraphArgs);
-    }
-#else
     thread_start(computeGraph, (void*)&computeGraphArgs);
-#endif
     GOTO_REAL();
 
     TIMER_READ(stop);
@@ -261,14 +247,7 @@ MAIN(argc, argv)
     TIMER_READ(start);
 
     GOTO_SIM();
-#ifdef OTM
-#pragma omp parallel
-    {
-        getStartLists((void*)&getStartListsArg);
-    }
-#else
     thread_start(getStartLists, (void*)&getStartListsArg);
-#endif
     GOTO_REAL();
 
     TIMER_READ(stop);
@@ -309,14 +288,7 @@ MAIN(argc, argv)
         TIMER_READ(start);
 
         GOTO_SIM();
-#ifdef OTM
-#pragma omp parallel
-        {
-            findSubGraphs0((void*)&findSubGraphs0Arg);
-        }
-#else
         thread_start(findSubGraphs0, (void*)&findSubGraphs0Arg);
-#endif
         GOTO_REAL();
 
         TIMER_READ(stop);
@@ -340,14 +312,7 @@ MAIN(argc, argv)
         TIMER_READ(start);
 
         GOTO_SIM();
-#ifdef OTM
-#pragma omp parallel
-        {
-            findSubGraphs1((void*)&findSubGraphs1Arg);
-        }
-#else
         thread_start(findSubGraphs1, (void*)&findSubGraphs1Arg);
-#endif
         GOTO_REAL();
 
         TIMER_READ(stop);
@@ -396,14 +361,7 @@ MAIN(argc, argv)
         TIMER_READ(start);
 
         GOTO_SIM();
-#ifdef OTM
-#pragma omp parallel
-        {
-            findSubGraphs2((void*)&findSubGraphs2Arg);
-        }
-#else
         thread_start(findSubGraphs2, (void*)&findSubGraphs2Arg);
-#endif
         GOTO_REAL();
 
         TIMER_READ(stop);
@@ -466,14 +424,7 @@ MAIN(argc, argv)
     TIMER_READ(start);
 
     GOTO_SIM();
-#ifdef OTM
-#pragma omp parallel
-    {
-        cutClusters((void*)G);
-    }
-#else
     thread_start(cutClusters, (void*)G);
-#endif
     GOTO_REAL();
 
     TIMER_READ(stop);

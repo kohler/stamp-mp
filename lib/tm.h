@@ -301,29 +301,11 @@
 #  define TM_MALLOC(size)               memory_get(thread_getId(), size)
 #  define TM_FREE(ptr)                  /* TODO: thread local free is non-trivial */
 
-#  ifdef OTM
-
-#    define thread_getId()              omp_get_thread_num()
-#    define thread_getNumThread()       omp_get_num_threads()
-#    define thread_startup(numThread)   omp_set_num_threads(numThread)
-#    define thread_shutdown()           /* nothing */
-#    define thread_barrier_wait();      _Pragma ("omp barrier")
-#    define TM_BEGIN()                  _Pragma ("omp transaction") {
-#    define TM_BEGIN_RO()               _Pragma ("omp transaction") {
-#    define TM_END()                    }
-#    define TM_RESTART()                _TM_Abort()
-
-#    define TM_EARLY_RELEASE(var)       TM_Release(&(var))
-
-#  else /* !OTM */
-
 #    define TM_BEGIN()                    TM_BeginClosed()
 #    define TM_BEGIN_RO()                 TM_BeginClosed()
 #    define TM_END()                      TM_EndClosed()
 #    define TM_RESTART()                  _TM_Abort()
 #    define TM_EARLY_RELEASE(var)         TM_Release(&(var))
-
-#  endif /* !OTM */
 
 
 /* =============================================================================
@@ -337,47 +319,13 @@
 #  include <stm.h>
 #  include "thread.h"
 
-#  if defined (OTM)
-
-#    define TM_ARG                        /* nothing */
-#    define TM_ARG_ALONE                  /* nothing */
-#    define TM_ARGDECL                    /* nothing */
-#    define TM_ARGDECL_ALONE              /* nothing */
-#    define TM_CALLABLE                   _Pragma ("omp tm_function")
-
-#    define thread_getId()                omp_get_thread_num()
-#    define thread_getNumThread()         omp_get_num_threads()
-#    define thread_startup(numThread)     omp_set_num_threads(numThread)
-#    define thread_shutdown()             /* nothing */
-
-#  else /* !OTM */
-
 #    define TM_ARG                        STM_SELF,
 #    define TM_ARG_ALONE                  STM_SELF
 #    define TM_ARGDECL                    STM_THREAD_T* TM_ARG
 #    define TM_ARGDECL_ALONE              STM_THREAD_T* TM_ARG_ALONE
 #    define TM_CALLABLE                   /* nothing */
 
-#endif /* !OTM */
-
 #  ifdef SIMULATOR
-
-#    ifdef OTM
-
-#      define TM_STARTUP(numThread)       STM_STARTUP(); \
-                                          STM_NEW_THREADS(numThread)
-#      define TM_SHUTDOWN()               STM_SHUTDOWN()
-
-#      define TM_THREAD_ENTER()           omp_set_self()
-#      define TM_THREAD_EXIT()            /* Nothing */
-#      define thread_barrier_wait();      _Pragma ("omp barrier")
-
-#      define P_MALLOC(size)              memory_get(thread_getId(), size)
-#      define P_FREE(ptr)                 /* TODO: thread local free is non-trivial */
-#      define TM_MALLOC(size)             memory_get(thread_getId(), size)
-#      define TM_FREE(ptr)                /* TODO: thread local free is non-trivial */
-
-#    else /* !OTM */
 
 #      define TM_STARTUP(numThread)       STM_STARTUP(); \
                                           STM_NEW_THREADS(numThread)
@@ -394,28 +342,7 @@
 #      define TM_MALLOC(size)             memory_get(thread_getId(), size)
 #      define TM_FREE(ptr)                /* TODO: thread local free is non-trivial */
 
-#    endif /* !OTM */
-
 #  else /* !SIMULATOR */
-
-#    ifdef OTM
-
-#      include <omp.h>
-#      include "tl2.h"
-
-#      define TM_STARTUP(numThread)     STM_STARTUP()
-#      define TM_SHUTDOWN()             STM_SHUTDOWN()
-
-#      define TM_THREAD_ENTER()         /* nothing */
-#      define TM_THREAD_EXIT()          /* nothing */
-#      define thread_barrier_wait();    _Pragma ("omp barrier")
-
-#      define P_MALLOC(size)            malloc(size)
-#      define P_FREE(ptr)               free(ptr)
-#      define TM_MALLOC(size)           malloc(size)
-#      define TM_FREE(ptr)              /* TODO: fix memory free problem with OpenTM */
-
-#    else /* !OTM */
 
 #      define TM_STARTUP(numThread)     STM_STARTUP()
 #      define TM_SHUTDOWN()             STM_SHUTDOWN()
@@ -429,20 +356,7 @@
 #      define TM_MALLOC(size)           STM_MALLOC(size)
 #      define TM_FREE(ptr)              STM_FREE(ptr)
 
-#    endif /* !OTM */
-
 #  endif /* !SIMULATOR */
-
-#  ifdef OTM
-
-#    define TM_BEGIN()                  _Pragma ("omp transaction") {
-#    define TM_BEGIN_RO()               _Pragma ("omp transaction") {
-#    define TM_END()                    }
-#    define TM_RESTART()                omp_abort()
-
-#    define TM_EARLY_RELEASE(var)       /* nothing */
-
-#  else /* !OTM */
 
 #    define TM_BEGIN()                  STM_BEGIN_WR()
 #    define TM_BEGIN_RO()               STM_BEGIN_RD()
@@ -450,9 +364,6 @@
 #    define TM_RESTART()                STM_RESTART()
 
 #    define TM_EARLY_RELEASE(var)       /* nothing */
-
-#  endif /* !OTM */
-
 
 /* =============================================================================
  * Sequential execution
@@ -515,22 +426,6 @@
  */
 #if defined(STM)
 
-#if defined(OTM)
-
-#  define TM_SHARED_READ(var)           (var)
-#  define TM_SHARED_READ_P(var)         (var)
-#  define TM_SHARED_READ_F(var)         (var)
-
-#  define TM_SHARED_WRITE(var, val)     ({var = val; var;})
-#  define TM_SHARED_WRITE_P(var, val)   ({var = val; var;})
-#  define TM_SHARED_WRITE_F(var, val)   ({var = val; var;})
-
-#  define TM_LOCAL_WRITE(var, val)      ({var = val; var;})
-#  define TM_LOCAL_WRITE_P(var, val)    ({var = val; var;})
-#  define TM_LOCAL_WRITE_F(var, val)    ({var = val; var;})
-
-#else /* OTM */
-
 #  define TM_SHARED_READ(var)           STM_READ(var)
 #  define TM_SHARED_READ_P(var)         STM_READ_P(var)
 #  define TM_SHARED_READ_F(var)         STM_READ_F(var)
@@ -542,8 +437,6 @@
 #  define TM_LOCAL_WRITE(var, val)      STM_LOCAL_WRITE(var, val)
 #  define TM_LOCAL_WRITE_P(var, val)    STM_LOCAL_WRITE_P(var, val)
 #  define TM_LOCAL_WRITE_F(var, val)    STM_LOCAL_WRITE_F(var, val)
-
-#endif /* !OTM */
 
 #else /* !STM */
 

@@ -433,14 +433,7 @@ MAIN(argc, argv)
     fflush(stdout);
     TIMER_READ(start);
     GOTO_SIM();
-#ifdef OTM
-#pragma omp parallel
-    {
-        client_run(clients);
-    }
-#else
     thread_start(client_run, (void*)clients);
-#endif
     GOTO_REAL();
     TIMER_READ(stop);
     puts("done.");

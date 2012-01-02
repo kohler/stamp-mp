@@ -218,14 +218,7 @@ MAIN(argc, argv)
     TIMER_T startTime;
     TIMER_READ(startTime);
     GOTO_SIM();
-#ifdef OTM
-#pragma omp parallel
-    {
-        router_solve((void *)&routerArg);
-    }
-#else
     thread_start(router_solve, (void*)&routerArg);
-#endif
     GOTO_REAL();
     TIMER_T stopTime;
     TIMER_READ(stopTime);
