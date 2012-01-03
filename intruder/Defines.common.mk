@@ -23,8 +23,6 @@ SRCS += \
 	$(LIB)/rbtree.c \
 	$(LIB)/thread.c \
 	$(LIB)/vector.c \
-#
-OBJS := ${SRCS:.c=.o}
 
 CFLAGS += -DMAP_USE_RBTREE
 

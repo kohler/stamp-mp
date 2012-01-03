@@ -19,15 +19,20 @@ LIBS     += -ltl2
 # Rules
 # ==============================================================================
 
+OBJ_DIR = $(ODIR)/$(PROG)_objs
+
+_OBJS := ${SRCS:.c=.o}
+OBJS = $(patsubst %,$(OBJ_DIR)/%,$(_OBJS))
+
 .PHONY: default
-default: $(PROG)
+default: $(ODIR)/$(PROG)
 
 .PHONY: clean
 clean:
-	$(RM) $(OBJS) $(PROG) $(OUTPUT)
+	$(RM) $(OBJS) $(ODIR)/$(PROG) $(OUTPUT)
 
-$(PROG): $(OBJS)
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $(PROG)
+$(ODIR)/$(PROG): $(OBJS)
+	$(LD) $(LDFLAGS) $^ $(LIBS) -o $(ODIR)/$(PROG)
 
 include ../common/Makefile.common
 

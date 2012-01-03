@@ -13,6 +13,7 @@ CPP      := g++
 CPPFLAGS += $(CFLAGS)
 LD       := g++
 LIBS     += -lpthread
+ODIR     := ../build
 
 # Remove these files when doing clean
 OUTPUT +=
