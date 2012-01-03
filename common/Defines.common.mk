@@ -13,7 +13,7 @@ CPP      := g++
 CPPFLAGS += $(CFLAGS)
 LD       := g++
 LIBS     += -lpthread
-ODIR     := ../build
+ODIR     := ../$(TARGET)
 
 # Remove these files when doing clean
 OUTPUT +=
@@ -21,6 +21,8 @@ OUTPUT +=
 LIB := ../lib
 
 STM := ../../tl2
+
+OBJ_DIR = $(ODIR)/$(PROG)_objs
 
 # ==============================================================================
 #

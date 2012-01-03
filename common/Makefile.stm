@@ -19,8 +19,6 @@ LIBS     += -ltl2
 # Rules
 # ==============================================================================
 
-OBJ_DIR = $(ODIR)/$(PROG)_objs
-
 _OBJS := ${SRCS:.c=.o}
 OBJS = $(patsubst %,$(OBJ_DIR)/%,$(_OBJS))
 
