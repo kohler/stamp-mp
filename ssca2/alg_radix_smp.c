@@ -209,10 +209,9 @@ all_countsort_node_aux_seq (long q,
         mhp[BITS(lKey[k],bitOff,m)]++;
     }
 
-    long last;
     long j;
     for (k = 0; k < R; k++) {
-        last = psHisto[k] = myHisto[k];
+        psHisto[k] = myHisto[k];
     }
 
     long* allHisto = psHisto;
