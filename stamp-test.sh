@@ -8,7 +8,7 @@ if [ $# -gt 3 ]; then
     exp=$1
     shift
 else
-    echo "stamp-test.sh log-file (seq | tl2 | tinystm) (sim | real) nb-threads..."
+    echo "stamp-test.sh log-file (seq | tl2 | tinystm | swisstm) (sim | real) nb-threads..."
     exit
 fi
 
