@@ -208,8 +208,11 @@ MAIN(argc, argv)
             fprintf(stderr, "Error: no such file (%s)\n", filename);
             exit(1);
         }
-        read(infile, &numObjects, sizeof(int));
-        read(infile, &numAttributes, sizeof(int));
+        if (read(infile, &numObjects, sizeof(int)) != sizeof(int))
+	    abort();
+
+        if (read(infile, &numAttributes, sizeof(int)) != sizeof(int))
+	    abort();
 
         /* Allocate space for attributes[] and read attributes of all objects */
         buf = (float*)malloc(numObjects * numAttributes * sizeof(float));
@@ -221,7 +224,9 @@ MAIN(argc, argv)
         for (i = 1; i < numObjects; i++) {
             attributes[i] = attributes[i-1] + numAttributes;
         }
-        read(infile, buf, (numObjects * numAttributes * sizeof(float)));
+        if (read(infile, buf, (numObjects * numAttributes * sizeof(float)))
+	    != (numObjects * numAttributes * sizeof(float)))
+	    abort();
         close(infile);
     } else {
         FILE *infile;
