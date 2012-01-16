@@ -98,12 +98,12 @@ threadWait (void* argPtr)
     THREAD_LOCAL_SET(global_threadId, (long)threadId);
 
     while (1) {
-        THREAD_BARRIER(global_barrierPtr, threadId); /* wait for start parallel */
+        THREAD_BARRIER(global_barrierPtr); /* wait for start parallel */
         if (global_doShutdown) {
             break;
         }
         global_funcPtr(global_argPtr);
-        THREAD_BARRIER(global_barrierPtr, threadId); /* wait for end parallel */
+        THREAD_BARRIER(global_barrierPtr); /* wait for end parallel */
         if (threadId == 0) {
             break;
         }
@@ -188,7 +188,7 @@ thread_shutdown ()
 {
     /* Make secondary threads exit wait() */
     global_doShutdown = TRUE;
-    THREAD_BARRIER(global_barrierPtr, 0);
+    THREAD_BARRIER(global_barrierPtr);
 
     long numThread = global_numThread;
 
@@ -348,8 +348,7 @@ thread_getNumThread()
 void
 thread_barrier_wait()
 {
-    long threadId = thread_getId();
-    THREAD_BARRIER(global_barrierPtr, threadId);
+    THREAD_BARRIER(global_barrierPtr);
 }
 
 

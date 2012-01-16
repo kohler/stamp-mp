@@ -111,7 +111,7 @@ extern "C" {
 #  define THREAD_BARRIER_T                  pthread_barrier_t
 #  define THREAD_BARRIER_ALLOC(N)           ((THREAD_BARRIER_T*)malloc(sizeof(THREAD_BARRIER_T)))
 #  define THREAD_BARRIER_INIT(bar, N)       pthread_barrier_init(bar, 0, N)
-#  define THREAD_BARRIER(bar, tid)          pthread_barrier_wait(bar)
+#  define THREAD_BARRIER(bar)               pthread_barrier_wait(bar)
 #  define THREAD_BARRIER_FREE(bar)          free(bar)
 
 typedef struct thread_barrier {
