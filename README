@@ -19,7 +19,7 @@ The Stanford Transactional Applications for Multi-Processors (STAMP) is a
 collection of applications well suited for transactional memory research. For
 each application, STAMP includes sequential code, parallel code that uses
 coarse-grain transactions, and reference data sets. We provide transactional
-code for both HTM and STM systems, and provide an STM system based on TL2 [3]. A
+code STM systems, and provide an STM system based on TL2 [3]. A
 characterization of the applications is given in [1] and [2].
 
 We are currently working on additional STAMP applications and welcome your

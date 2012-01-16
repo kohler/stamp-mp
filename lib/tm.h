@@ -184,49 +184,7 @@
  */
 
 
-/* =============================================================================
- * HTM - Hardware Transactional Memory
- * =============================================================================
- */
-
-#ifdef HTM
-
-#  include <assert.h>
-#  include <tmapi.h>
-#  include "memory.h"
-#  include "thread.h"
-#  include "types.h"
-
-#  define TM_ARG                        /* nothing */
-#  define TM_ARG_ALONE                  /* nothing */
-#  define TM_ARGDECL                    /* nothing */
-#  define TM_ARGDECL_ALONE              /* nothing */
-#  define TM_CALLABLE                   /* nothing */
-
-#  define TM_STARTUP(numThread)         /* nothing */
-#  define TM_SHUTDOWN()                 /* nothing */
-
-#  define TM_THREAD_ENTER()             /* nothing */
-#  define TM_THREAD_EXIT()              /* nothing */
-
-#  define P_MALLOC(size)                memory_get(thread_getId(), size)
-#  define P_FREE(ptr)                   /* TODO: thread local free is non-trivial */
-#  define TM_MALLOC(size)               memory_get(thread_getId(), size)
-#  define TM_FREE(ptr)                  /* TODO: thread local free is non-trivial */
-
-#    define TM_BEGIN()                    TM_BeginClosed()
-#    define TM_BEGIN_RO()                 TM_BeginClosed()
-#    define TM_END()                      TM_EndClosed()
-#    define TM_RESTART()                  _TM_Abort()
-#    define TM_EARLY_RELEASE(var)         TM_Release(&(var))
-
-
-/* =============================================================================
- * STM - Software Transactional Memory
- * =============================================================================
- */
-
-#elif defined(STM)
+#if defined(STM)
 
 #  include <string.h>
 #  include <stm.h>
