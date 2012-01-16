@@ -202,7 +202,7 @@ process ()
 
     while (1) {
 
-        element_t* elementPtr;
+        element_t* elementPtr = NULL;
 
         TM_BEGIN();
         elementPtr = TMHEAP_REMOVE(workHeapPtr);
@@ -211,7 +211,7 @@ process ()
             break;
         }
 
-        bool_t isGarbage;
+        bool_t isGarbage = 0;
         TM_BEGIN();
         isGarbage = TMELEMENT_ISGARBAGE(elementPtr);
         TM_END();
@@ -223,7 +223,7 @@ process ()
             continue;
         }
 
-        long numAdded;
+        long numAdded = 0;
 
         TM_BEGIN();
         PREGION_CLEARBAD(regionPtr);

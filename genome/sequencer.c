@@ -360,10 +360,10 @@ sequencer_run (void* argPtr)
 
             char* segment =
                 (char*)((pair_t*)list_iter_next(&it, chainPtr))->firstPtr;
-            constructEntry_t* constructEntryPtr;
+            constructEntry_t* constructEntryPtr = NULL;
             long j;
             ulong_t startHash;
-            bool_t status;
+            bool_t status = 0;
 
             /* Find an empty constructEntries entry */
             TM_BEGIN();

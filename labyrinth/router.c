@@ -375,7 +375,7 @@ router_solve (void* argPtr)
      */
     while (1) {
 
-        pair_t* coordinatePairPtr;
+        pair_t* coordinatePairPtr = NULL;
         TM_BEGIN();
         if (TMQUEUE_ISEMPTY(workQueuePtr)) {
             coordinatePairPtr = NULL;

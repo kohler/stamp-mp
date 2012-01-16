@@ -1185,7 +1185,7 @@ learnStructure (void* argPtr)
 
     while (1) {
 
-        learner_task_t* taskPtr;
+        learner_task_t* taskPtr = NULL;
         TM_BEGIN();
         taskPtr = TMpopTask(TM_ARG  taskListPtr);
         TM_END();
@@ -1197,7 +1197,7 @@ learnStructure (void* argPtr)
         long fromId = taskPtr->fromId;
         long toId = taskPtr->toId;
 
-        bool_t isTaskValid;
+        bool_t isTaskValid = 0;
 
         TM_BEGIN();
 
@@ -1379,8 +1379,8 @@ learnStructure (void* argPtr)
          * Update/read globals
          */
 
-        float baseLogLikelihood;
-        long numTotalParent;
+        float baseLogLikelihood = 0.0;
+        long numTotalParent = 0;
 
         TM_BEGIN();
         float oldBaseLogLikelihood =

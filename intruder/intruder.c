@@ -195,7 +195,7 @@ processPackets (void* argPtr)
 
     while (1) {
 
-        char* bytes;
+        char* bytes = NULL;
         TM_BEGIN();
         bytes = TMSTREAM_GETPACKET(streamPtr);
         TM_END();
@@ -221,7 +221,7 @@ processPackets (void* argPtr)
             assert(status);
         }
 
-        char* data;
+        char* data = NULL;
         long decodedFlowId;
         TM_BEGIN();
         data = TMDECODER_GETCOMPLETE(decoderPtr, &decodedFlowId);
