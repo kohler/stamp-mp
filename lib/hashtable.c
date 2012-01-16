@@ -92,11 +92,6 @@
 # include "STAMP_config.h"
 #endif
 
-#if defined(STM)
-#  warning "hash table resizing currently disabled for TM"
-#endif
-
-
 /* =============================================================================
  * hashtable_iter_reset
  * =============================================================================
