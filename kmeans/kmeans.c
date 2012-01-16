@@ -157,7 +157,6 @@ MAIN(argc, argv)
     char*   line;
     int     isBinaryFile = 0;
     int     nloops;
-    int     len;
     int     nthreads;
     float   threshold = 0.001;
     int     opt;
@@ -280,7 +279,6 @@ MAIN(argc, argv)
     assert(cluster_assign);
 
     nloops = 1;
-    len = max_nclusters - min_nclusters + 1;
 
     for (i = 0; i < nloops; i++) {
         /*
