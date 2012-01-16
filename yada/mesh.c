@@ -372,7 +372,8 @@ mesh_read (mesh_t* meshPtr, char* fileNamePrefix)
     snprintf(fileName, fileNameSize, "%s.node", fileNamePrefix);
     inputFile = fopen(fileName, "r");
     assert(inputFile);
-    fgets(inputBuff, inputBuffSize, inputFile);
+    if (!fgets(inputBuff, inputBuffSize, inputFile))
+	abort();
     sscanf(inputBuff, "%li %li", &numEntry, &numDimension);
     assert(numDimension == 2); /* must be 2-D */
     numCoordinate = numEntry + 1; /* numbering can start from 1 */
@@ -401,11 +402,13 @@ mesh_read (mesh_t* meshPtr, char* fileNamePrefix)
     snprintf(fileName, fileNameSize, "%s.poly", fileNamePrefix);
     inputFile = fopen(fileName, "r");
     assert(inputFile);
-    fgets(inputBuff, inputBuffSize, inputFile);
+    if (!fgets(inputBuff, inputBuffSize, inputFile))
+	abort();
     sscanf(inputBuff, "%li %li", &numEntry, &numDimension);
     assert(numEntry == 0); /* .node file used for vertices */
     assert(numDimension == 2); /* must be edge */
-    fgets(inputBuff, inputBuffSize, inputFile);
+    if (!fgets(inputBuff, inputBuffSize, inputFile))
+	abort();
     sscanf(inputBuff, "%li", &numEntry);
     for (i = 0; i < numEntry; i++) {
         long id;
@@ -435,7 +438,8 @@ mesh_read (mesh_t* meshPtr, char* fileNamePrefix)
     snprintf(fileName, fileNameSize, "%s.ele", fileNamePrefix);
     inputFile = fopen(fileName, "r");
     assert(inputFile);
-    fgets(inputBuff, inputBuffSize, inputFile);
+    if (!fgets(inputBuff, inputBuffSize, inputFile))
+	abort();
     sscanf(inputBuff, "%li %li", &numEntry, &numDimension);
     assert(numDimension == 3); /* must be triangle */
     for (i = 0; i < numEntry; i++) {
