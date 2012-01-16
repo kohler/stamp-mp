@@ -5,23 +5,6 @@
 # ==============================================================================
 
 
-# ==============================================================================
-# Rules
-# ==============================================================================
-
-_OBJS := ${SRCS:.c=.o}
-OBJS = $(patsubst %,$(OBJ_DIR)/%,$(_OBJS))
-
-.PHONY: default
-default: $(ODIR)/$(PROG)
-
-.PHONY: clean
-clean:
-	$(RM) $(OBJS) $(ODIR)/$(PROG) $(OUTPUT)
-
-$(ODIR)/$(PROG): $(OBJS)
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $(ODIR)/$(PROG)
-
 include ../common/Makefile.common
 
 
