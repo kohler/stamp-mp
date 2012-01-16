@@ -611,7 +611,7 @@ TMhashtable_find (TM_ARGDECL  hashtable_t* hashtablePtr, void* keyPtr)
 }
 
 
-#if defined(STM)
+#if defined(HASHTABLE_RESIZABLE)
 /* =============================================================================
  * rehash
  * =============================================================================
