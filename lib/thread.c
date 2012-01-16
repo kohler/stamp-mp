@@ -348,9 +348,7 @@ thread_getNumThread()
 void
 thread_barrier_wait()
 {
-#ifndef SIMULATOR
     long threadId = thread_getId();
-#endif /* !SIMULATOR */
     THREAD_BARRIER(global_barrierPtr, threadId);
 }
 

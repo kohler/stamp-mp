@@ -1304,9 +1304,7 @@ TMrbtree_alloc (TM_ARGDECL  long (*compare)(const void*, const void*))
 static void
 releaseNode (node_t* n)
 {
-#ifndef SIMULATOR
     free(n);
-#endif    
 }
 
 

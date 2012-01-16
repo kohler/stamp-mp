@@ -184,11 +184,8 @@ MAIN (argc,argv)
     TIMER_T start;
     TIMER_T stop;
 
-    GOTO_REAL();
-
     /* Initialization */
     parseArgs(argc, (char** const)argv);
-    SIM_GET_NUM_CPU(global_params[PARAM_THREAD]);
 
     printf("Creating gene and segments... ");
     fflush(stdout);
@@ -227,9 +224,7 @@ MAIN (argc,argv)
     printf("Sequencing gene... ");
     fflush(stdout);
     TIMER_READ(start);
-    GOTO_SIM();
     thread_start(sequencer_run, (void*)sequencerPtr);
-    GOTO_REAL();
     TIMER_READ(stop);
     puts("done.");
     printf("Time = %lf\n", TIMER_DIFF_SECONDS(start, stop));
@@ -260,8 +255,6 @@ MAIN (argc,argv)
 
     TM_SHUTDOWN();
     P_MEMORY_SHUTDOWN();
-
-    GOTO_SIM();
 
     thread_shutdown();
 

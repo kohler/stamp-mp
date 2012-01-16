@@ -78,91 +78,10 @@
 # include "STAMP_config.h"
 #endif
 
-/* =============================================================================
- * Simulator Specific Interface
- *
- * MAIN(argc, argv)
- *     Declare the main function with argc being the identifier for the argument
- *     count and argv being the name for the argument string list
- *
- * MAIN_RETURN(int_val)
- *     Returns from MAIN function
- *
- * GOTO_SIM()
- *     Switch simulator to simulation mode
- *
- * GOTO_REAL()
- *     Switch simulator to non-simulation (real) mode
- *     Note: use in sequential region only
- *
- * IS_IN_SIM()
- *     Returns true if simulator is in simulation mode
- *
- * SIM_GET_NUM_CPU(var)
- *     Assigns the number of simulated CPUs to "var"
- *
- * P_MEMORY_STARTUP
- *     Start up the memory allocator system that handles malloc/free
- *     in parallel regions (but not in transactions)
- *
- * P_MEMORY_SHUTDOWN
- *     Shutdown the memory allocator system that handles malloc/free
- *     in parallel regions (but not in transactions)
- *
- * =============================================================================
- */
-#ifdef SIMULATOR
-
-#  include <simapi.h>
-
-#  define MAIN(argc, argv)              void mainX (int argc, \
-                                                    const char** argv, \
-                                                    const char** envp)
-#  define MAIN_RETURN(val)              return /* value is ignored */
-
-#  define GOTO_SIM()                    goto_sim()
-#  define GOTO_REAL()                   goto_real()
-#  define IS_IN_SIM()                   (inSimulation)
-
-#  define SIM_GET_NUM_CPU(var)          ({ \
-                                            if (!IS_IN_SIM()) { \
-                                                GOTO_SIM(); \
-                                                var = Sim_GetNumCpus(); \
-                                                GOTO_REAL(); \
-                                            } else { \
-                                                var = Sim_GetNumCpus(); \
-                                            } \
-                                            var; \
-                                        })
-
-#  define TM_PRINTF                     Sim_Print
-#  define TM_PRINT0                     Sim_Print0
-#  define TM_PRINT1                     Sim_Print1
-#  define TM_PRINT2                     Sim_Print2
-#  define TM_PRINT3                     Sim_Print3
-
-#  include "memory.h"
-#  define P_MEMORY_STARTUP(numThread)   do { \
-                                            bool_t status; \
-                                            status = memory_init((numThread), \
-                                                                 ((1<<28) / numThread), \
-                                                                 2); \
-                                            assert(status); \
-                                        } while (0) /* enforce comma */
-#  define P_MEMORY_SHUTDOWN()           memory_destroy()
-
-#else /* !SIMULATOR */
-
 #  include <stdio.h>
 
 #  define MAIN(argc, argv)              int main (int argc, char** argv)
 #  define MAIN_RETURN(val)              return val
-
-#  define GOTO_SIM()                    /* nothing */
-#  define GOTO_REAL()                   /* nothing */
-#  define IS_IN_SIM()                   (0)
-
-#  define SIM_GET_NUM_CPU(var)          /* nothing */
 
 #  define TM_PRINTF                     printf
 #  define TM_PRINT0                     printf
@@ -172,8 +91,6 @@
 
 #  define P_MEMORY_STARTUP(numThread)   /* nothing */
 #  define P_MEMORY_SHUTDOWN()           /* nothing */
-
-#endif /* !SIMULATOR */
 
 
 /* =============================================================================
@@ -274,10 +191,6 @@
 
 #ifdef HTM
 
-#  ifndef SIMULATOR
-#    error HTM requries SIMULATOR
-#  endif
-
 #  include <assert.h>
 #  include <tmapi.h>
 #  include "memory.h"
@@ -325,25 +238,6 @@
 #    define TM_ARGDECL_ALONE              STM_THREAD_T* TM_ARG_ALONE
 #    define TM_CALLABLE                   /* nothing */
 
-#  ifdef SIMULATOR
-
-#      define TM_STARTUP(numThread)       STM_STARTUP(); \
-                                          STM_NEW_THREADS(numThread)
-#      define TM_SHUTDOWN()               STM_SHUTDOWN()
-
-#      define TM_THREAD_ENTER()           TM_ARGDECL_ALONE = \
-                                              STM_GET_THREAD(thread_getId()); \
-                                          STM_SET_SELF(TM_ARG_ALONE)
-
-#      define TM_THREAD_EXIT()            STM_FREE_THREAD(TM_ARG_ALONE)
-
-#      define P_MALLOC(size)              memory_get(thread_getId(), size)
-#      define P_FREE(ptr)                 /* TODO: thread local free is non-trivial */
-#      define TM_MALLOC(size)             memory_get(thread_getId(), size)
-#      define TM_FREE(ptr)                /* TODO: thread local free is non-trivial */
-
-#  else /* !SIMULATOR */
-
 #      define TM_STARTUP(numThread)     STM_STARTUP()
 #      define TM_SHUTDOWN()             STM_SHUTDOWN()
 
@@ -355,8 +249,6 @@
 #      define P_FREE(ptr)               free(ptr)
 #      define TM_MALLOC(size)           STM_MALLOC(size)
 #      define TM_FREE(ptr)              STM_FREE(ptr)
-
-#  endif /* !SIMULATOR */
 
 #    define TM_BEGIN()                  STM_BEGIN_WR()
 #    define TM_BEGIN_RO()               STM_BEGIN_RD()
@@ -386,23 +278,10 @@
 #  define TM_THREAD_ENTER()             /* nothing */
 #  define TM_THREAD_EXIT()              /* nothing */
 
-#  ifdef SIMULATOR
-
-#    include "thread.h"
-
-#    define P_MALLOC(size)              memory_get(thread_getId(), size)
-#    define P_FREE(ptr)                 /* TODO: thread local free is non-trivial */
-#    define TM_MALLOC(size)             memory_get(thread_getId(), size)
-#    define TM_FREE(ptr)                /* TODO: thread local free is non-trivial */
-
-#  else /* !SIMULATOR */
-
 #    define P_MALLOC(size)              malloc(size)
 #    define P_FREE(ptr)                 free(ptr)
 #    define TM_MALLOC(size)             malloc(size)
 #    define TM_FREE(ptr)                free(ptr)
-
-#  endif /* !SIMULATOR */
 
 #  define TM_BEGIN()                    /* nothing */
 #  define TM_BEGIN_RO()                 /* nothing */

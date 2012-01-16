@@ -414,11 +414,8 @@ MAIN(argc, argv)
     TIMER_T start;
     TIMER_T stop;
 
-    GOTO_REAL();
-
     /* Initialization */
     parseArgs(argc, (char** const)argv);
-    SIM_GET_NUM_CPU(global_params[PARAM_CLIENTS]);
     managerPtr = initializeManager();
     assert(managerPtr != NULL);
     clients = initializeClients(managerPtr);
@@ -432,9 +429,7 @@ MAIN(argc, argv)
     printf("Running clients... ");
     fflush(stdout);
     TIMER_READ(start);
-    GOTO_SIM();
     thread_start(client_run, (void*)clients);
-    GOTO_REAL();
     TIMER_READ(stop);
     puts("done.");
     printf("Time = %0.6lf\n",
@@ -455,8 +450,6 @@ MAIN(argc, argv)
 
     TM_SHUTDOWN();
     P_MEMORY_SHUTDOWN();
-
-    GOTO_SIM();
 
     thread_shutdown();
 

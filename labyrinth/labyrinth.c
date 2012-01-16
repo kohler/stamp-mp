@@ -189,14 +189,11 @@ parseArgs (long argc, char* const argv[])
  */
 MAIN(argc, argv)
 {
-    GOTO_REAL();
-
     /*
      * Initialization
      */
     parseArgs(argc, (char** const)argv);
     long numThread = global_params[PARAM_THREAD];
-    SIM_GET_NUM_CPU(numThread);
     TM_STARTUP(numThread);
     P_MEMORY_STARTUP(numThread);
     thread_startup(numThread);
@@ -217,9 +214,7 @@ MAIN(argc, argv)
     router_solve_arg_t routerArg = {routerPtr, mazePtr, pathVectorListPtr};
     TIMER_T startTime;
     TIMER_READ(startTime);
-    GOTO_SIM();
     thread_start(router_solve, (void*)&routerArg);
-    GOTO_REAL();
     TIMER_T stopTime;
     TIMER_READ(stopTime);
 
@@ -245,8 +240,6 @@ MAIN(argc, argv)
 
     TM_SHUTDOWN();
     P_MEMORY_SHUTDOWN();
-
-    GOTO_SIM();
 
     thread_shutdown();
 

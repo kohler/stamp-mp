@@ -250,15 +250,12 @@ processPackets (void* argPtr)
  */
 MAIN(argc, argv)
 {
-    GOTO_REAL();
-
     /*
      * Initialization
      */
 
     parseArgs(argc, (char** const)argv);
     long numThread = global_params[PARAM_THREAD];
-    SIM_GET_NUM_CPU(numThread);
     TM_STARTUP(numThread);
     P_MEMORY_STARTUP(numThread);
     thread_startup(numThread);
@@ -306,9 +303,7 @@ MAIN(argc, argv)
 
     TIMER_T startTime;
     TIMER_READ(startTime);
-    GOTO_SIM();
     thread_start(processPackets, (void*)&arg);
-    GOTO_REAL();
     TIMER_T stopTime;
     TIMER_READ(stopTime);
     printf("Elapsed time    = %f seconds\n", TIMER_DIFF_SECONDS(startTime, stopTime));
@@ -346,8 +341,6 @@ MAIN(argc, argv)
 
     TM_SHUTDOWN();
     P_MEMORY_SHUTDOWN();
-
-    GOTO_SIM();
 
     thread_shutdown();
 

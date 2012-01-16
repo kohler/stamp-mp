@@ -230,8 +230,6 @@ score (net_t* netPtr, adtree_t* adtreePtr)
  */
 MAIN(argc, argv)
 {
-    GOTO_REAL();
-
     /*
      * Initialization
      */
@@ -245,7 +243,6 @@ MAIN(argc, argv)
     long percentParent = global_params[PARAM_PERCENT];
     global_insertPenalty = global_params[PARAM_INSERT];
     global_maxNumEdgeLearned = global_params[PARAM_EDGE];
-    SIM_GET_NUM_CPU(numThread);
     TM_STARTUP(numThread);
     P_MEMORY_STARTUP(numThread);
     thread_startup(numThread);
@@ -321,11 +318,9 @@ MAIN(argc, argv)
 
     TIMER_T learnStartTime;
     TIMER_READ(learnStartTime);
-    GOTO_SIM();
 
     learner_run(learnerPtr);
 
-    GOTO_REAL();
     TIMER_T learnStopTime;
     TIMER_READ(learnStopTime);
 
@@ -342,10 +337,8 @@ MAIN(argc, argv)
     bool_t status = net_isCycle(learnerPtr->netPtr);
     assert(!status);
 
-#ifndef SIMULATOR
     float learnScore = learner_score(learnerPtr);
     printf("Learn score  = %f\n", learnScore);
-#endif
     printf("Actual score = %f\n", actualScore);
 
     /*
@@ -354,17 +347,10 @@ MAIN(argc, argv)
 
     fflush(stdout);
     random_free(randomPtr);
-#ifndef SIMULATOR
     adtree_free(adtreePtr);
-#  if 0    
-    learner_free(learnerPtr);
-#  endif    
-#endif
 
     TM_SHUTDOWN();
     P_MEMORY_SHUTDOWN();
-
-    GOTO_SIM();
 
     thread_shutdown();
 

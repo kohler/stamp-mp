@@ -270,14 +270,11 @@ process ()
  */
 MAIN(argc, argv)
 {
-    GOTO_REAL();
-
     /*
      * Initialization
      */
 
     parseArgs(argc, (char** const)argv);
-    SIM_GET_NUM_CPU(global_numThread);
     TM_STARTUP(global_numThread);
     P_MEMORY_STARTUP(global_numThread);
     thread_startup(global_numThread);
@@ -302,9 +299,7 @@ MAIN(argc, argv)
 
     TIMER_T start;
     TIMER_READ(start);
-    GOTO_SIM();
     thread_start(process, NULL);
-    GOTO_REAL();
     TIMER_T stop;
     TIMER_READ(stop);
 
@@ -337,8 +332,6 @@ MAIN(argc, argv)
 
     TM_SHUTDOWN();
     P_MEMORY_SHUTDOWN();
-
-    GOTO_SIM();
 
     thread_shutdown();
 

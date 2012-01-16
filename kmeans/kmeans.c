@@ -162,8 +162,6 @@ MAIN(argc, argv)
     float   threshold = 0.001;
     int     opt;
 
-    GOTO_REAL();
-
     line = (char*)malloc(MAX_LINE_LENGTH); /* reserve memory line */
 
     nthreads = 1;
@@ -198,8 +196,6 @@ MAIN(argc, argv)
         fprintf(stderr, "Error: max_clusters must be >= min_clusters\n");
         usage((char*)argv[0]);
     }
-
-    SIM_GET_NUM_CPU(nthreads);
 
     numAttributes = 0;
     numObjects = 0;
@@ -380,8 +376,6 @@ MAIN(argc, argv)
     free(buf);
 
     TM_SHUTDOWN();
-
-    GOTO_SIM();
 
     thread_shutdown();
 

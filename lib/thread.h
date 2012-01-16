@@ -108,19 +108,11 @@ extern "C" {
 #define THREAD_COND_BROADCAST(cond)         pthread_cond_broadcast(&(cond))
 #define THREAD_COND_WAIT(cond, lock)        pthread_cond_wait(&(cond), &(lock))
 
-#ifdef SIMULATOR
 #  define THREAD_BARRIER_T                  pthread_barrier_t
 #  define THREAD_BARRIER_ALLOC(N)           ((THREAD_BARRIER_T*)malloc(sizeof(THREAD_BARRIER_T)))
 #  define THREAD_BARRIER_INIT(bar, N)       pthread_barrier_init(bar, 0, N)
 #  define THREAD_BARRIER(bar, tid)          pthread_barrier_wait(bar)
 #  define THREAD_BARRIER_FREE(bar)          free(bar)
-#else /* !SIMULATOR */
-#  define THREAD_BARRIER_T                  thread_barrier_t
-#  define THREAD_BARRIER_ALLOC(N)           thread_barrier_alloc(N)
-#  define THREAD_BARRIER_INIT(bar, N)       thread_barrier_init(bar)
-#  define THREAD_BARRIER(bar, tid)          thread_barrier(bar, tid)
-#  define THREAD_BARRIER_FREE(bar)          thread_barrier_free(bar)
-#endif /* !SIMULATOR */
 
 typedef struct thread_barrier {
     THREAD_MUTEX_T countLock;

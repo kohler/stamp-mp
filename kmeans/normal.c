@@ -263,8 +263,6 @@ normal_exec (int       nthreads,
 
     TIMER_READ(start);
 
-    GOTO_SIM();
-
     do {
         delta = 0.0;
 
@@ -298,8 +296,6 @@ normal_exec (int       nthreads,
         delta /= npoints;
 
     } while ((delta > threshold) && (loop++ < 500));
-
-    GOTO_REAL();
 
     TIMER_READ(stop);
     global_time += TIMER_DIFF_SECONDS(start, stop);

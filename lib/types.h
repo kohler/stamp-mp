@@ -79,13 +79,6 @@ extern "C" {
 #endif
 
 
-#ifdef SIMULATOR
-#  undef TRUE
-#  undef FALSE
-#  undef bool
-#endif
-
-
 typedef unsigned long ulong_t;
 
 enum {

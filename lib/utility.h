@@ -73,13 +73,6 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 
-
-#ifdef SIMULATOR
-#  undef MAX
-#  undef MIN
-#endif
-
-
 #define MAX(a,b) \
     ({ \
         typeof(a) _a = (a); \

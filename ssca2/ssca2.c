@@ -82,8 +82,6 @@
 
 MAIN(argc, argv)
 {
-    GOTO_REAL();
-
     /*
      * Tuple for Scalable Data Generation
      * stores startVertex, endVertex, long weight and other info
@@ -141,7 +139,6 @@ MAIN(argc, argv)
 
     getUserParameters(argc, (char** const) argv);
 
-    SIM_GET_NUM_CPU(THREADS);
     TM_STARTUP(THREADS);
     P_MEMORY_STARTUP(THREADS);
     thread_startup(THREADS);
@@ -170,9 +167,7 @@ MAIN(argc, argv)
     TIMER_READ(start);
 
 #ifdef USE_PARALLEL_DATA_GENERATION
-    GOTO_SIM();
     thread_start(genScalData, (void*)SDGdata);
-    GOTO_REAL();
 #else /* !USE_PARALLEL_DATA_GENERATION */
     genScalData_seq(SDGdata);
 #endif /* !USE_PARALLEL_DATA_GENERATION */
@@ -207,9 +202,7 @@ MAIN(argc, argv)
 
     TIMER_READ(start);
 
-    GOTO_SIM();
     thread_start(computeGraph, (void*)&computeGraphArgs);
-    GOTO_REAL();
 
     TIMER_READ(stop);
 
@@ -246,9 +239,7 @@ MAIN(argc, argv)
 
     TIMER_READ(start);
 
-    GOTO_SIM();
     thread_start(getStartLists, (void*)&getStartListsArg);
-    GOTO_REAL();
 
     TIMER_READ(stop);
 
@@ -287,9 +278,7 @@ MAIN(argc, argv)
 
         TIMER_READ(start);
 
-        GOTO_SIM();
         thread_start(findSubGraphs0, (void*)&findSubGraphs0Arg);
-        GOTO_REAL();
 
         TIMER_READ(stop);
 
@@ -311,9 +300,7 @@ MAIN(argc, argv)
 
         TIMER_READ(start);
 
-        GOTO_SIM();
         thread_start(findSubGraphs1, (void*)&findSubGraphs1Arg);
-        GOTO_REAL();
 
         TIMER_READ(stop);
 
@@ -360,9 +347,7 @@ MAIN(argc, argv)
 
         TIMER_READ(start);
 
-        GOTO_SIM();
         thread_start(findSubGraphs2, (void*)&findSubGraphs2Arg);
-        GOTO_REAL();
 
         TIMER_READ(stop);
 
@@ -423,9 +408,7 @@ MAIN(argc, argv)
 
     TIMER_READ(start);
 
-    GOTO_SIM();
     thread_start(cutClusters, (void*)G);
-    GOTO_REAL();
 
     TIMER_READ(stop);
 
@@ -517,8 +500,6 @@ MAIN(argc, argv)
 
     TM_SHUTDOWN();
     P_MEMORY_SHUTDOWN();
-
-    GOTO_SIM();
 
     thread_shutdown();
 

@@ -319,9 +319,6 @@ getMemoryFromPool (pool_t* poolPtr, size_t numByte)
     block_t* blockPtr = poolPtr->blocksPtr;
 
     if ((blockPtr->size + numByte) > blockPtr->capacity) {
-#ifdef SIMULATOR
-        assert(0);
-#endif
         blockPtr = addBlockToPool(poolPtr, numByte);
         if (blockPtr == NULL) {
             return NULL;
