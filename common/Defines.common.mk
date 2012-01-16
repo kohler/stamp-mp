@@ -6,9 +6,9 @@
 
 
 CC       := gcc
-CFLAGS   += -g -Wall -pthread
+CFLAGS   += -g -Wall -pthread 
 CFLAGS   += -O3
-CFLAGS   += -I$(LIB)
+CFLAGS   += -I$(LIB) -I$(LIB)/$(TARGET)
 CPP      := g++
 CPPFLAGS += $(CFLAGS)
 LD       := g++

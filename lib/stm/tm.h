@@ -1,8 +1,8 @@
 /* =============================================================================
  *
- * tm.h
+ * stm/tm.h
  *
- * Utility defines for transactional memory
+ * Utility defines for transactional memory for TL2 STM
  *
  * =============================================================================
  *
@@ -74,24 +74,7 @@
 #ifndef TM_H
 #define TM_H 1
 
-#ifdef HAVE_CONFIG_H
-# include "STAMP_config.h"
-#endif
-
-#  include <stdio.h>
-
-#  define MAIN(argc, argv)              int main (int argc, char** argv)
-#  define MAIN_RETURN(val)              return val
-
-#  define TM_PRINTF                     printf
-#  define TM_PRINT0                     printf
-#  define TM_PRINT1                     printf
-#  define TM_PRINT2                     printf
-#  define TM_PRINT3                     printf
-
-#  define P_MEMORY_STARTUP(numThread)   /* nothing */
-#  define P_MEMORY_SHUTDOWN()           /* nothing */
-
+#include "../tm_common.h"
 
 /* =============================================================================
  * Transactional Memory System Interface
@@ -183,73 +166,34 @@
  * =============================================================================
  */
 
+#include <string.h>
+#include <stm.h>
+#include "thread.h"
 
-#if defined(STM)
+#define TM_ARG                        STM_SELF,
+#define TM_ARG_ALONE                  STM_SELF
+#define TM_ARGDECL                    STM_THREAD_T* TM_ARG
+#define TM_ARGDECL_ALONE              STM_THREAD_T* TM_ARG_ALONE
+#define TM_CALLABLE                   /* nothing */
 
-#  include <string.h>
-#  include <stm.h>
-#  include "thread.h"
+#define TM_STARTUP(numThread)     STM_STARTUP()
+#define TM_SHUTDOWN()             STM_SHUTDOWN()
 
-#    define TM_ARG                        STM_SELF,
-#    define TM_ARG_ALONE                  STM_SELF
-#    define TM_ARGDECL                    STM_THREAD_T* TM_ARG
-#    define TM_ARGDECL_ALONE              STM_THREAD_T* TM_ARG_ALONE
-#    define TM_CALLABLE                   /* nothing */
-
-#      define TM_STARTUP(numThread)     STM_STARTUP()
-#      define TM_SHUTDOWN()             STM_SHUTDOWN()
-
-#      define TM_THREAD_ENTER()         TM_ARGDECL_ALONE = STM_NEW_THREAD(); \
+#define TM_THREAD_ENTER()         TM_ARGDECL_ALONE = STM_NEW_THREAD(); \
                                         STM_INIT_THREAD(TM_ARG_ALONE, thread_getId())
-#      define TM_THREAD_EXIT()          STM_FREE_THREAD(TM_ARG_ALONE)
+#define TM_THREAD_EXIT()          STM_FREE_THREAD(TM_ARG_ALONE)
 
-#      define P_MALLOC(size)            malloc(size)
-#      define P_FREE(ptr)               free(ptr)
-#      define TM_MALLOC(size)           STM_MALLOC(size)
-#      define TM_FREE(ptr)              STM_FREE(ptr)
+#define P_MALLOC(size)            malloc(size)
+#define P_FREE(ptr)               free(ptr)
+#define TM_MALLOC(size)           STM_MALLOC(size)
+#define TM_FREE(ptr)              STM_FREE(ptr)
 
-#    define TM_BEGIN()                  STM_BEGIN_WR()
-#    define TM_BEGIN_RO()               STM_BEGIN_RD()
-#    define TM_END()                    STM_END()
-#    define TM_RESTART()                STM_RESTART()
+#define TM_BEGIN()                  STM_BEGIN_WR()
+#define TM_BEGIN_RO()               STM_BEGIN_RD()
+#define TM_END()                    STM_END()
+#define TM_RESTART()                STM_RESTART()
 
-#    define TM_EARLY_RELEASE(var)       /* nothing */
-
-/* =============================================================================
- * Sequential execution
- * =============================================================================
- */
-
-#else /* SEQUENTIAL */
-
-#  include <assert.h>
-
-#  define TM_ARG                        /* nothing */
-#  define TM_ARG_ALONE                  /* nothing */
-#  define TM_ARGDECL                    /* nothing */
-#  define TM_ARGDECL_ALONE              /* nothing */
-#  define TM_CALLABLE                   /* nothing */
-
-#  define TM_STARTUP(numThread)         /* nothing */
-#  define TM_SHUTDOWN()                 /* nothing */
-
-#  define TM_THREAD_ENTER()             /* nothing */
-#  define TM_THREAD_EXIT()              /* nothing */
-
-#    define P_MALLOC(size)              malloc(size)
-#    define P_FREE(ptr)                 free(ptr)
-#    define TM_MALLOC(size)             malloc(size)
-#    define TM_FREE(ptr)                free(ptr)
-
-#  define TM_BEGIN()                    /* nothing */
-#  define TM_BEGIN_RO()                 /* nothing */
-#  define TM_END()                      /* nothing */
-#  define TM_RESTART()                  assert(0)
-
-#  define TM_EARLY_RELEASE(var)         /* nothing */
-
-#endif /* SEQUENTIAL */
-
+#define TM_EARLY_RELEASE(var)       /* nothing */
 
 /* =============================================================================
  * Transactional Memory System interface for shared memory accesses
@@ -261,36 +205,18 @@
  * 3) _F suffix: for accessing variables of type "float"
  * =============================================================================
  */
-#if defined(STM)
 
-#  define TM_SHARED_READ(var)           STM_READ(var)
-#  define TM_SHARED_READ_P(var)         STM_READ_P(var)
-#  define TM_SHARED_READ_F(var)         STM_READ_F(var)
+#define TM_SHARED_READ(var)           STM_READ(var)
+#define TM_SHARED_READ_P(var)         STM_READ_P(var)
+#define TM_SHARED_READ_F(var)         STM_READ_F(var)
 
-#  define TM_SHARED_WRITE(var, val)     STM_WRITE((var), val)
-#  define TM_SHARED_WRITE_P(var, val)   STM_WRITE_P((var), val)
-#  define TM_SHARED_WRITE_F(var, val)   STM_WRITE_F((var), val)
+#define TM_SHARED_WRITE(var, val)     STM_WRITE((var), val)
+#define TM_SHARED_WRITE_P(var, val)   STM_WRITE_P((var), val)
+#define TM_SHARED_WRITE_F(var, val)   STM_WRITE_F((var), val)
 
-#  define TM_LOCAL_WRITE(var, val)      STM_LOCAL_WRITE(var, val)
-#  define TM_LOCAL_WRITE_P(var, val)    STM_LOCAL_WRITE_P(var, val)
-#  define TM_LOCAL_WRITE_F(var, val)    STM_LOCAL_WRITE_F(var, val)
-
-#else /* !STM */
-
-#  define TM_SHARED_READ(var)           (var)
-#  define TM_SHARED_READ_P(var)         (var)
-#  define TM_SHARED_READ_F(var)         (var)
-
-#  define TM_SHARED_WRITE(var, val)     ({var = val; var;})
-#  define TM_SHARED_WRITE_P(var, val)   ({var = val; var;})
-#  define TM_SHARED_WRITE_F(var, val)   ({var = val; var;})
-
-#  define TM_LOCAL_WRITE(var, val)      ({var = val; var;})
-#  define TM_LOCAL_WRITE_P(var, val)    ({var = val; var;})
-#  define TM_LOCAL_WRITE_F(var, val)    ({var = val; var;})
-
-#endif /* !STM */
-
+#define TM_LOCAL_WRITE(var, val)      STM_LOCAL_WRITE(var, val)
+#define TM_LOCAL_WRITE_P(var, val)    STM_LOCAL_WRITE_P(var, val)
+#define TM_LOCAL_WRITE_F(var, val)    STM_LOCAL_WRITE_F(var, val)
 
 #endif /* TM_H */
 
