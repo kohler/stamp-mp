@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROGS="bayes genome intruder kmeans labyrinth ssca2 vacation yada"
-TARGETS="seq tl2"
+TARGETS="seq tl2 tinystm"
 
 for t in ${TARGETS}
 do
