@@ -9,7 +9,8 @@
 # ==============================================================================
 
 _OBJS := ${SRCS:.c=.o}
-OBJS = $(patsubst %,$(OBJ_DIR)/%,$(_OBJS))
+__OBJS := $(patsubst ../%,%,$(_OBJS))
+OBJS = $(patsubst %,$(OBJ_DIR)/%,$(__OBJS))
 
 .PHONY: default
 default: $(ODIR)/$(PROG)
@@ -21,6 +22,10 @@ clean:
 $(ODIR)/$(PROG): $(OBJS)
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $(ODIR)/$(PROG)
 $(OBJ_DIR)/%.o: %.c *.h
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_DIR)/%.o: ../%.c *.h
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c $< -o $@
 
