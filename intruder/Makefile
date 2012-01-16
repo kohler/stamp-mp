@@ -1,13 +1,13 @@
 # ==============================================================================
 #
-# Makefile.seq
+# Makefile
 #
 # ==============================================================================
 
 
 include ../common/Defines.common.mk
 include ./Defines.common.mk
-include ../common/Makefile.seq
+include ../common/Makefile.$(TARGET)
 
 .PHONY: test_decoder
 test_decoder: CFLAGS += -DTEST_DECODER -O0
@@ -37,11 +37,10 @@ test_stream: CFLAGS += -DTEST_STREAM -O0
 test_stream: LIB_SRCS := $(LIB)/{mt19937ar,pair,queue,random,rbtree,vector}.c
 test_stream:
 	$(CC) $(CFLAGS) stream.c detector.c dictionary.c preprocessor.c $(LIB_SRCS) -o $@
-	
 
 # ==============================================================================
 #
-# Makefile.seq
+# Makefile
 #
 # ==============================================================================
 

@@ -1,13 +1,13 @@
 # ==============================================================================
 #
-# Makefile.seq
+# Makefile
 #
 # ==============================================================================
 
 
 include ../common/Defines.common.mk
 include ./Defines.common.mk
-include ../common/Makefile.seq
+include ../common/Makefile.$(TARGET)
 
 
 .PHONY: test_data
@@ -29,11 +29,10 @@ test_adtree:
 test_learner: CFLAGS += -DTEST_LEARNER -O0
 test_learner:
 	$(CC) $(CFLAGS) learner.c sort.c adtree.c data.c net.c $(LIB_SRCS) -lm -o $@
-	
 
 # ==============================================================================
 #
-# Makefile.seq
+# Makefile
 #
 # ==============================================================================
 

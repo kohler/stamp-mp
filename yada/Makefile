@@ -1,13 +1,13 @@
 # ==============================================================================
 #
-# Makefile.seq
+# Makefile
 #
 # ==============================================================================
 
 
 include ../common/Defines.common.mk
 include ./Defines.common.mk
-include ../common/Makefile.seq
+include ../common/Makefile.$(TARGET)
 
 .PHONY: test_coordinate
 test_coordinate: CFLAGS += -DTEST_COORDINATE
@@ -29,7 +29,7 @@ test_mesh:
 
 # ==============================================================================
 #
-# Makefile.seq
+# Makefile
 #
 # ==============================================================================
 
