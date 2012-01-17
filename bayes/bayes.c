@@ -348,6 +348,7 @@ MAIN(argc, argv)
     fflush(stdout);
     random_free(randomPtr);
     adtree_free(adtreePtr);
+    learner_free(learnerPtr);
 
     TM_SHUTDOWN();
     P_MEMORY_SHUTDOWN();
