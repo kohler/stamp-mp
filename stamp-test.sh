@@ -37,7 +37,7 @@ do
 
 echo "=================================================="  | tee -a ${lf}
 echo "Executing: ${test} ${threads}" | tee -a ${lf}
-exec $test $threads | tee -a ${lf}
+exec valgrind --leak-check=full  --show-reachable=yes $test $threads | tee -a ${lf}
 
 done
 
