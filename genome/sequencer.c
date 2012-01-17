@@ -634,13 +634,11 @@ sequencer_free (sequencer_t* sequencerPtr)
     }
     free(sequencerPtr->startHashToConstructEntryTables);
     free(sequencerPtr->endInfoEntries);
-#if 0
-    /* TODO: fix mixed sequential/parallel allocation */
+
     hashtable_free(sequencerPtr->uniqueSegmentsPtr);
     if (sequencerPtr->sequence != NULL) {
         free(sequencerPtr->sequence);
     }
-#endif
     free(sequencerPtr);
 }
 
