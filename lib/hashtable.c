@@ -390,7 +390,7 @@ freeBuckets (list_t** buckets, long numBucket)
 {
     long i;
 
-    for (i = 0; i < numBucket; i++) {
+    for (i = 0; i < numBucket + 1; i++) {
         list_free(buckets[i]);
     }
 
