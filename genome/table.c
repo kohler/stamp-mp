@@ -179,6 +179,7 @@ table_free (table_t* tablePtr)
         list_free(tablePtr->buckets[i]);
     }
 
+    free(tablePtr->buckets);
     free(tablePtr);
 }
 
