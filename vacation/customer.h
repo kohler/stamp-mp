@@ -120,6 +120,8 @@ customer_hash (customer_t* customerPtr);
 void
 customer_free (TM_ARGDECL  customer_t* customerPtr);
 
+void
+customer_free_seq (customer_t* customerPtr);
 
 /* =============================================================================
  * customer_addReservationInfo

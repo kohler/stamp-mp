@@ -270,6 +270,22 @@ initializeManager ()
     return managerPtr;
 }
 
+static void 
+cleanupManager (manager_t* managerPtr)
+{
+    long numRelation = (long)global_params[PARAM_RELATIONS];
+    long i;
+    /* Now delete everything */
+    for (i=0; i < numRelation; i++) {
+	    manager_deleteCustomer_seq (managerPtr, i+1);
+    }
+    for (i=0; i < numRelation; i++) {
+	    manager_deleteCar_seq (managerPtr, i+1, manager_queryCar_seq (managerPtr, i+1));
+	    manager_deleteFlight_seq (managerPtr, i+1);
+	    manager_deleteRoom_seq (managerPtr, i+1, manager_queryRoom_seq(managerPtr, i+1));
+    }
+	
+}
 
 /* =============================================================================
  * initializeClients
@@ -328,63 +344,6 @@ initializeClients (manager_t* managerPtr)
 }
 
 
-/* =============================================================================
- * checkTables
- * -- some simple checks (not comprehensive)
- * -- dependent on tasks generated for clients in initializeClients()
- * =============================================================================
- */
-void
-checkTables (manager_t* managerPtr)
-{
-    long i;
-    long numRelation = (long)global_params[PARAM_RELATIONS];
-    MAP_T* customerTablePtr = managerPtr->customerTablePtr;
-    MAP_T* tables[] = {
-        managerPtr->carTablePtr,
-        managerPtr->flightTablePtr,
-        managerPtr->roomTablePtr,
-    };
-    long numTable = sizeof(tables) / sizeof(tables[0]);
-    bool_t (*manager_add[])(manager_t*, long, long, long) = {
-        &manager_addCar_seq,
-        &manager_addFlight_seq,
-        &manager_addRoom_seq
-    };
-    long t;
-
-    printf("Checking tables... ");
-    fflush(stdout);
-
-    /* Check for unique customer IDs */
-    long percentQuery = (long)global_params[PARAM_QUERIES];
-    long queryRange = (long)((double)percentQuery / 100.0 * (double)numRelation + 0.5);
-    long maxCustomerId = queryRange + 1;
-    for (i = 1; i <= maxCustomerId; i++) {
-        if (MAP_FIND(customerTablePtr, i)) {
-            if (MAP_REMOVE(customerTablePtr, i)) {
-                assert(!MAP_FIND(customerTablePtr, i));
-            }
-        }
-    }
-
-    /* Check reservation tables for consistency and unique ids */
-    for (t = 0; t < numTable; t++) {
-        MAP_T* tablePtr = tables[t];
-        for (i = 1; i <= numRelation; i++) {
-            if (MAP_FIND(tablePtr, i)) {
-                assert(manager_add[t](managerPtr, i, 0, 0)); /* validate entry */
-                if (MAP_REMOVE(tablePtr, i)) {
-                    assert(!MAP_REMOVE(tablePtr, i));
-                }
-            }
-        }
-    }
-
-    puts("done.");
-    fflush(stdout);
-}
-
 
 /* =============================================================================
  * freeClients
@@ -400,6 +359,7 @@ freeClients (client_t** clients)
         client_t* clientPtr = clients[i];
         client_free(clientPtr);
     }
+    free(clients);
 }
 
 
@@ -435,11 +395,12 @@ MAIN(argc, argv)
     printf("Time = %0.6lf\n",
            TIMER_DIFF_SECONDS(start, stop));
     fflush(stdout);
-    checkTables(managerPtr);
 
     /* Clean up */
     printf("Deallocating memory... ");
     fflush(stdout);
+
+    cleanupManager(managerPtr);
     freeClients(clients);
     /*
      * TODO: The contents of the manager's table need to be deallocated.

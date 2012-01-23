@@ -162,6 +162,7 @@ manager_free (manager_t* managerPtr)
     tableFree(managerPtr->roomTablePtr);
     tableFree(managerPtr->flightTablePtr);
     tableFree(managerPtr->customerTablePtr);
+    free(managerPtr);
 }
 
 
@@ -237,6 +238,7 @@ addReservation_seq (MAP_T* tablePtr, long id, long num, long price)
         if (reservationPtr->numTotal == 0) {
             status = MAP_REMOVE(tablePtr, id);
             assert(status);
+	    free(reservationPtr);
         } else {
             reservation_updatePrice_seq(reservationPtr, price);
         }
@@ -284,6 +286,13 @@ manager_deleteCar (TM_ARGDECL  manager_t* managerPtr, long carId, long numCar)
     return addReservation(TM_ARG  managerPtr->carTablePtr, carId, -numCar, -1);
 }
 
+bool_t
+manager_deleteCar_seq (manager_t* managerPtr, long carId, long numCar)
+{
+    /* -1 keeps old price */
+    return addReservation_seq(managerPtr->carTablePtr, carId, -numCar, -1);
+}
+
 
 /* =============================================================================
  * manager_addRoom
@@ -322,6 +331,13 @@ manager_deleteRoom (TM_ARGDECL  manager_t* managerPtr, long roomId, long numRoom
 {
     /* -1 keeps old price */
     return addReservation(TM_ARG  managerPtr->roomTablePtr, roomId, -numRoom, -1);
+}
+
+bool_t
+manager_deleteRoom_seq (manager_t* managerPtr, long roomId, long numRoom)
+{
+    /* -1 keeps old price */
+    return addReservation_seq(managerPtr->roomTablePtr, roomId, -numRoom, -1);
 }
 
 
@@ -374,6 +390,26 @@ manager_deleteFlight (TM_ARGDECL  manager_t* managerPtr, long flightId)
                           flightId,
                           -1*(long)TM_SHARED_READ(reservationPtr->numTotal),
                           -1 /* -1 keeps old price */);
+}
+
+bool_t
+manager_deleteFlight_seq (manager_t* managerPtr, long flightId)
+{
+    reservation_t* reservationPtr;
+
+    reservationPtr = (reservation_t*)MAP_FIND(managerPtr->flightTablePtr, flightId);
+    if (reservationPtr == NULL) {
+        return FALSE;
+    }
+
+    if (reservationPtr->numUsed > 0) {
+        return FALSE; /* somebody has a reservation */
+    }
+
+    return addReservation_seq(managerPtr->flightTablePtr,
+			      flightId,
+			      -reservationPtr->numTotal,
+			      -1 /* -1 keeps old price */);
 }
 
 
@@ -478,6 +514,44 @@ manager_deleteCustomer (TM_ARGDECL  manager_t* managerPtr, long customerId)
     return TRUE;
 }
 
+bool_t
+manager_deleteCustomer_seq (manager_t* managerPtr, long customerId)
+{
+    customer_t* customerPtr;
+    MAP_T* reservationTables[NUM_RESERVATION_TYPE];
+    list_t* reservationInfoListPtr;
+    list_iter_t it;
+
+    customerPtr = (customer_t*)MAP_FIND(managerPtr->customerTablePtr, customerId);
+    if (customerPtr == NULL) {
+        return FALSE;
+    }
+
+    reservationTables[RESERVATION_CAR] = managerPtr->carTablePtr;
+    reservationTables[RESERVATION_ROOM] = managerPtr->roomTablePtr;
+    reservationTables[RESERVATION_FLIGHT] = managerPtr->flightTablePtr;
+
+    /* Cancel this customer's reservations */
+    reservationInfoListPtr = customerPtr->reservationInfoListPtr;
+    list_iter_reset(&it, reservationInfoListPtr);
+    while (list_iter_hasNext(&it, reservationInfoListPtr)) {
+        reservation_info_t* reservationInfoPtr;
+        reservation_t* reservationPtr;
+        reservationInfoPtr =
+            (reservation_info_t*)list_iter_next(&it, reservationInfoListPtr);
+        reservationPtr =
+            (reservation_t*)MAP_FIND(reservationTables[reservationInfoPtr->type],
+                                     reservationInfoPtr->id);
+        reservation_cancel_seq(reservationPtr);
+        free(reservationInfoPtr);
+    }
+
+    MAP_REMOVE(managerPtr->customerTablePtr, customerId);
+    customer_free_seq(customerPtr);
+
+    return TRUE;
+}
+
 
 /* =============================================================================
  * QUERY INTERFACE
@@ -499,6 +573,20 @@ queryNumFree (TM_ARGDECL  MAP_T* tablePtr, long id)
     reservationPtr = (reservation_t*)TMMAP_FIND(tablePtr, id);
     if (reservationPtr != NULL) {
         numFree = (long)TM_SHARED_READ(reservationPtr->numFree);
+    }
+
+    return numFree;
+}
+
+static long
+queryNumFree_seq (MAP_T* tablePtr, long id)
+{
+    long numFree = -1;
+    reservation_t* reservationPtr;
+
+    reservationPtr = (reservation_t*)MAP_FIND(tablePtr, id);
+    if (reservationPtr != NULL) {
+        numFree = reservationPtr->numFree;
     }
 
     return numFree;
@@ -537,6 +625,14 @@ manager_queryCar (TM_ARGDECL  manager_t* managerPtr, long carId)
     return queryNumFree(TM_ARG  managerPtr->carTablePtr, carId);
 }
 
+long
+manager_queryCar_seq (manager_t* managerPtr, long carId)
+{
+    return queryNumFree_seq(managerPtr->carTablePtr, carId);
+}
+
+
+
 
 /* =============================================================================
  * manager_queryCarPrice
@@ -563,6 +659,12 @@ manager_queryRoom (TM_ARGDECL  manager_t* managerPtr, long roomId)
     return queryNumFree(TM_ARG  managerPtr->roomTablePtr, roomId);
 }
 
+long
+manager_queryRoom_seq (manager_t* managerPtr, long roomId)
+{
+    return queryNumFree_seq(managerPtr->roomTablePtr, roomId);
+}
+
 
 /* =============================================================================
  * manager_queryRoomPrice
@@ -587,6 +689,12 @@ long
 manager_queryFlight (TM_ARGDECL  manager_t* managerPtr, long flightId)
 {
     return queryNumFree(TM_ARG  managerPtr->flightTablePtr, flightId);
+}
+
+long
+manager_queryFlight_seq (manager_t* managerPtr, long flightId)
+{
+    return queryNumFree_seq(managerPtr->flightTablePtr, flightId);
 }
 
 

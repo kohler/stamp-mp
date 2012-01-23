@@ -155,6 +155,13 @@ customer_free (TM_ARGDECL  customer_t* customerPtr)
     TM_FREE(customerPtr);
 }
 
+void
+customer_free_seq (customer_t* customerPtr)
+{
+    list_free(customerPtr->reservationInfoListPtr);
+    free(customerPtr);
+}
+
 
 /* =============================================================================
  * customer_addReservationInfo

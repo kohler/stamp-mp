@@ -122,6 +122,7 @@ client_alloc (long id,
 void
 client_free (client_t* clientPtr)
 {
+    random_free(clientPtr->randomPtr);
     free(clientPtr);
 }
 
@@ -310,8 +311,13 @@ client_run (void* argPtr)
         } /* switch (action) */
 
     } /* for i */
+ 
+    P_FREE(types);
+    P_FREE(ids);
+    P_FREE(ops);
+    P_FREE(prices);
 
-    TM_THREAD_EXIT();
+   TM_THREAD_EXIT();
 }
 
 
