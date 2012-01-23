@@ -237,6 +237,18 @@ MAIN(argc, argv)
     puts("Verification passed.");
     maze_free(mazePtr);
     router_free(routerPtr);
+    
+    list_iter_reset(&it, pathVectorListPtr);
+    while (list_iter_hasNext(&it, pathVectorListPtr)) {
+        vector_t* pathVectorPtr = (vector_t*)list_iter_next(&it, pathVectorListPtr);
+	vector_t *pointVectorPtr;
+	while ((pointVectorPtr = vector_popBack (pathVectorPtr)) != NULL) {
+	    PVECTOR_FREE(pointVectorPtr);
+	}
+	PVECTOR_FREE(pathVectorPtr);
+    }
+    
+    list_free(pathVectorListPtr);
 
     TM_SHUTDOWN();
     P_MEMORY_SHUTDOWN();

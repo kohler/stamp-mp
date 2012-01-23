@@ -390,6 +390,8 @@ router_solve (void* argPtr)
         coordinate_t* srcPtr = coordinatePairPtr->firstPtr;
         coordinate_t* dstPtr = coordinatePairPtr->secondPtr;
 
+	pair_free(coordinatePairPtr);
+
         bool_t success = FALSE;
         vector_t* pointVectorPtr = NULL;
 

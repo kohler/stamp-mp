@@ -113,12 +113,23 @@ maze_alloc ()
 void
 maze_free (maze_t* mazePtr)
 {
+    coordinate_t* coordPtr;
     if (mazePtr->gridPtr != NULL) {
         grid_free(mazePtr->gridPtr);
     }
     queue_free(mazePtr->workQueuePtr);
     vector_free(mazePtr->wallVectorPtr);
+    
+    while ((coordPtr = vector_popBack (mazePtr->srcVectorPtr)) != NULL) {
+	coordinate_free(coordPtr);
+    }
+        
     vector_free(mazePtr->srcVectorPtr);
+
+    while ((coordPtr = vector_popBack (mazePtr->dstVectorPtr)) != NULL) {
+	coordinate_free(coordPtr);
+    }
+        
     vector_free(mazePtr->dstVectorPtr);
     free(mazePtr);
 }
@@ -243,6 +254,8 @@ maze_read (maze_t* mazePtr, char* inputFileName)
         }
 
     } /* iterate over lines in input file */
+
+    fclose(inputFile);
 
     /*
      * Initialize grid contents
