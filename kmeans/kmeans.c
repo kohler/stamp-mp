@@ -274,6 +274,8 @@ MAIN(argc, argv)
         fclose(infile);
     }
 
+    free(line);
+
     TM_STARTUP(nthreads);
     thread_startup(nthreads);
 
@@ -373,6 +375,7 @@ MAIN(argc, argv)
     printf("Time: %lg seconds\n", global_time);
 
     free(cluster_assign);
+    free(attributes[0]);
     free(attributes);
     free(cluster_centres[0]);
     free(cluster_centres);
