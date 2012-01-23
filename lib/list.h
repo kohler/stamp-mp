@@ -185,6 +185,13 @@ TMlist_alloc (TM_ARGDECL  long (*compare)(const void*, const void*));
 void
 list_free (list_t* listPtr);
 
+/* =============================================================================
+ * list_free_data: frees list and frees list data
+ * =============================================================================
+ */
+void
+list_free_data (list_t* listPtr);
+
 
 /* =============================================================================
  * Plist_free
@@ -204,6 +211,15 @@ Plist_free (list_t* listPtr);
  */
 void
 TMlist_free (TM_ARGDECL  list_t* listPtr);
+
+/* =============================================================================
+ * TMlist_free_data
+ * -- If NULL passed for 'compare' function, will compare data pointer addresses
+ * -- Returns NULL on failure
+ * =============================================================================
+ */
+void
+TMlist_free_data (TM_ARGDECL  list_t* listPtr);
 
 
 
@@ -351,6 +367,7 @@ Plist_clear (list_t* listPtr);
 #define TMLIST_ITER_NEXT(it, list)      TMlist_iter_next(TM_ARG  it, list)
 #define TMLIST_ALLOC(cmp)               TMlist_alloc(TM_ARG  cmp)
 #define TMLIST_FREE(list)               TMlist_free(TM_ARG  list)
+#define TMLIST_FREE_DATA(list)          TMlist_free_data(TM_ARG  list)
 #define TMLIST_GETSIZE(list)            TMlist_getSize(TM_ARG  list)
 #define TMLIST_ISEMPTY(list)            TMlist_isEmpty(TM_ARG  list)
 #define TMLIST_FIND(list, data)         TMlist_find(TM_ARG  list, data)

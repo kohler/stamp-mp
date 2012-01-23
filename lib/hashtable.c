@@ -391,7 +391,7 @@ freeBuckets (list_t** buckets, long numBucket)
     long i;
 
     for (i = 0; i < numBucket + 1; i++) {
-        list_free(buckets[i]);
+        list_free_data(buckets[i]);
     }
 
     free(buckets);
@@ -408,7 +408,7 @@ TMfreeBuckets (TM_ARGDECL  list_t** buckets, long numBucket)
     long i;
 
     for (i = 0; i < numBucket; i++) {
-        TMLIST_FREE( buckets[i]);
+        TMLIST_FREE_DATA( buckets[i]);
     }
 
     TM_FREE(buckets);
