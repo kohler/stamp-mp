@@ -187,7 +187,8 @@ TMfindBestRemoveTask (TM_ARGDECL  findBestTaskArg_t* argPtr);
  * -- For list
  * =============================================================================
  */
-static long
+TM_CALLABLE 
+long
 compareTask (const void* aPtr, const void* bPtr)
 {
     learner_task_t* aTaskPtr = (learner_task_t*)aPtr;
@@ -211,7 +212,8 @@ compareTask (const void* aPtr, const void* bPtr)
  * -- For vector_sort
  * =============================================================================
  */
-static int
+TM_CALLABLE
+int
 compareQuery (const void* aPtr, const void* bPtr)
 {
     query_t* aQueryPtr = (query_t*)(*(void**)aPtr);

@@ -102,7 +102,8 @@ struct net {
  * compareId
  * =============================================================================
  */
-static long
+TM_CALLABLE
+long
 compareId (const void* aPtr, const void* bPtr)
 {
     long a = (long)aPtr;

@@ -94,6 +94,7 @@ typedef struct vector {
  * -- Returns NULL if failed
  * =============================================================================
  */
+TM_CALLABLE
 vector_t*
 vector_alloc (long initCapacity);
 
@@ -103,6 +104,7 @@ vector_alloc (long initCapacity);
  * -- Returns NULL if failed
  * =============================================================================
  */
+TM_CALLABLE
 vector_t*
 Pvector_alloc (long initCapacity);
 
@@ -111,6 +113,7 @@ Pvector_alloc (long initCapacity);
  * vector_free
  * =============================================================================
  */
+TM_CALLABLE
 void
 vector_free (vector_t* vectorPtr);
 
@@ -119,6 +122,7 @@ vector_free (vector_t* vectorPtr);
  * Pvector_free
  * =============================================================================
  */
+TM_CALLABLE
 void
 Pvector_free (vector_t* vectorPtr);
 
@@ -128,6 +132,7 @@ Pvector_free (vector_t* vectorPtr);
  * -- Returns NULL if failed
  * =============================================================================
  */
+TM_CALLABLE
 void*
 vector_at (vector_t* vectorPtr, long i);
 
@@ -137,6 +142,7 @@ vector_at (vector_t* vectorPtr, long i);
  * -- Returns FALSE if fail, else TRUE
  * =============================================================================
  */
+TM_CALLABLE
 bool_t
 vector_pushBack (vector_t* vectorPtr, void* dataPtr);
 
@@ -146,6 +152,7 @@ vector_pushBack (vector_t* vectorPtr, void* dataPtr);
  * -- Returns FALSE if fail, else TRUE
  * =============================================================================
  */
+TM_CALLABLE
 bool_t
 Pvector_pushBack (vector_t* vectorPtr, void* dataPtr);
 
@@ -155,6 +162,7 @@ Pvector_pushBack (vector_t* vectorPtr, void* dataPtr);
  * -- Returns NULL if fail, else returns last element
  * =============================================================================
  */
+TM_CALLABLE
 void*
 vector_popBack (vector_t* vectorPtr);
 
@@ -163,6 +171,7 @@ vector_popBack (vector_t* vectorPtr);
  * vector_getSize
  * =============================================================================
  */
+TM_CALLABLE
 long
 vector_getSize (vector_t* vectorPtr);
 
@@ -171,6 +180,7 @@ vector_getSize (vector_t* vectorPtr);
  * vector_clear
  * =============================================================================
  */
+TM_CALLABLE
 void
 vector_clear (vector_t* vectorPtr);
 
@@ -182,11 +192,15 @@ vector_clear (vector_t* vectorPtr);
 void
 vector_sort (vector_t* vectorPtr, int (*compare) (const void*, const void*));
 
+TM_CALLABLE
+void
+TMvector_sort (vector_t* vectorPtr, TM_CALLABLE int (*compare) (const void*, const void*));
 
 /* =============================================================================
  * vector_copy
  * =============================================================================
  */
+TM_CALLABLE
 bool_t
 vector_copy (vector_t* dstVectorPtr, vector_t* srcVectorPtr);
 
@@ -195,6 +209,7 @@ vector_copy (vector_t* dstVectorPtr, vector_t* srcVectorPtr);
  * Pvector_copy
  * =============================================================================
  */
+TM_CALLABLE
 bool_t
 Pvector_copy (vector_t* dstVectorPtr, vector_t* srcVectorPtr);
 

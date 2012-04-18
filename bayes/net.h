@@ -110,6 +110,7 @@ net_applyOperation (net_t* netPtr, operation_t op, long fromId, long toId);
  * TMnet_applyOperation
  * =============================================================================
  */
+TM_CALLABLE
 void
 TMnet_applyOperation (TM_ARGDECL
                       net_t* netPtr, operation_t op, long fromId, long toId);
@@ -127,6 +128,7 @@ net_hasEdge (net_t* netPtr, long fromId, long toId);
  * TMnet_hasEdge
  * =============================================================================
  */
+TM_CALLABLE
 bool_t
 TMnet_hasEdge (TM_ARGDECL  net_t* netPtr, long fromId, long toId);
 
@@ -147,6 +149,7 @@ net_isPath (net_t* netPtr,
  * TMnet_isPath
  * =============================================================================
  */
+TM_CALLABLE
 bool_t
 TMnet_isPath (TM_ARGDECL
               net_t* netPtr,
@@ -168,6 +171,7 @@ net_isCycle (net_t* netPtr);
  * net_getParentIdListPtr
  * =============================================================================
  */
+TM_CALLABLE
 list_t*
 net_getParentIdListPtr (net_t* netPtr, long id);
 
@@ -226,6 +230,7 @@ net_findDescendants (net_t* netPtr,
  * -- Returns false if id is not root node (i.e., has cycle back id)
  * =============================================================================
  */
+TM_CALLABLE
 bool_t
 TMnet_findDescendants (TM_ARGDECL
                        net_t* netPtr,

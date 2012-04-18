@@ -73,6 +73,7 @@
 #define BITMAP_H 1
 
 
+#include "tm.h"
 #include "types.h"
 
 
@@ -128,6 +129,7 @@ Pbitmap_free (bitmap_t* bitmapPtr);
  * -- Returns TRUE on success, else FALSE
  * =============================================================================
  */
+TM_CALLABLE
 bool_t
 bitmap_set (bitmap_t* bitmapPtr, long i);
 
@@ -147,6 +149,7 @@ bitmap_clear (bitmap_t* bitmapPtr, long i);
  * -- Clears all bit to 0
  * =============================================================================
  */
+TM_CALLABLE
 void
 bitmap_clearAll (bitmap_t* bitmapPtr);
 
@@ -156,6 +159,7 @@ bitmap_clearAll (bitmap_t* bitmapPtr);
  * -- Returns TRUE if ith bit is set, else FALSE
  * =============================================================================
  */
+TM_CALLABLE
 bool_t
 bitmap_isSet (bitmap_t* bitmapPtr, long i);
 
@@ -167,6 +171,7 @@ bitmap_isSet (bitmap_t* bitmapPtr, long i);
  * -- If all bits are set, returns -1
  * =============================================================================
  */
+TM_CALLABLE
 long
 bitmap_findClear (bitmap_t* bitmapPtr, long startIndex);
 
