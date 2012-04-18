@@ -1,5 +1,10 @@
 *~
 *.o
+gcc/
+tl2/
+swisstm/
+seq/
+tinystm/
 bayes/bayes
 genome/genome
 intruder/intruder
