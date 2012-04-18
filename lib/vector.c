@@ -275,6 +275,50 @@ vector_sort (vector_t* vectorPtr, int (*compare) (const void*, const void*))
     qsort((void*)vectorPtr->elements, vectorPtr->size, sizeof(void**), compare);
 }
 
+static void TMswap(void *a, void *b, size_t size, void *tmp)
+{
+    __builtin_memcpy(tmp, a, size);
+    __builtin_memcpy(a, b, size);
+    __builtin_memcpy(b, tmp, size);
+}
+
+static void TMqsort(void *base, size_t nmemb, size_t size,
+		    TM_CALLABLE int(*compar)(const void *, const void *),
+		    void *tmp)
+{
+    void *l, *r;
+    if (nmemb == 2) {
+	void * piv = base;
+	l = base + size;
+	if (compar(piv, l) > 0) {
+	    TMswap(piv, l, size, tmp);
+	}
+    } else if (nmemb > 1) {
+	void * piv = base;
+	l = base + size;
+	r = base + (size * (nmemb - 1));
+	while (l < r) {
+	    if (compar(l, piv) <= 0) {
+		l+=size;
+	    } else {
+		TMswap(l, r, size, tmp);
+		r = r - size;
+	    }
+	}
+	if (compar(l, base) < 0)
+	    TMswap(l, base, size, tmp);
+	TMqsort(base, ((l - base)/size), size, compar, tmp);
+	TMqsort(l, (nmemb - (size_t)(l - base)/size), size, compar, tmp);
+    }
+}
+
+void
+TMvector_sort (vector_t* vectorPtr, int (*compare) (const void*, const void*))
+{
+    void *tmp = TM_MALLOC(vectorPtr->size);
+    TMqsort((void*)vectorPtr->elements, vectorPtr->size, sizeof(void**), compare, tmp);
+    TM_FREE(tmp);
+}
 
 /* =============================================================================
  * vector_copy
@@ -411,7 +455,7 @@ main ()
     printf("copy ");
     printVector(copyVectorPtr);
     printf("sort ");
-    vector_sort(copyVectorPtr, &compareInt);
+    TMvector_sort(copyVectorPtr, &compareInt);
     printVector(copyVectorPtr);
 
     vector_free(vectorPtr);

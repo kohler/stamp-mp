@@ -473,15 +473,15 @@ TMnet_isPath (TM_ARGDECL
     assert(visitedBitmapPtr->numBit == vector_getSize(nodeVectorPtr));
 
     PBITMAP_CLEARALL(visitedBitmapPtr);
-    PQUEUE_CLEAR(workQueuePtr);
+    TMQUEUE_CLEAR(workQueuePtr);
 
-    status = PQUEUE_PUSH(workQueuePtr, (void*)fromId);
+    status = TMQUEUE_PUSH(workQueuePtr, (void*)fromId);
     assert(status);
 
-    while (!PQUEUE_ISEMPTY(workQueuePtr)) {
-        long id = (long)queue_pop(workQueuePtr);
+    while (!TMQUEUE_ISEMPTY(workQueuePtr)) {
+        long id = (long)TMQUEUE_POP(workQueuePtr);
         if (id == toId) {
-            queue_clear(workQueuePtr);
+            TMQUEUE_CLEAR(workQueuePtr);
             return TRUE;
         }
         status = PBITMAP_SET(visitedBitmapPtr, id);
@@ -493,7 +493,7 @@ TMnet_isPath (TM_ARGDECL
         while (TMLIST_ITER_HASNEXT(&it, childIdListPtr)) {
             long childId = (long)TMLIST_ITER_NEXT(&it, childIdListPtr);
             if (!PBITMAP_ISSET(visitedBitmapPtr, childId)) {
-                status = PQUEUE_PUSH(workQueuePtr, (void*)childId);
+                status = TMQUEUE_PUSH(workQueuePtr, (void*)childId);
                 assert(status);
             }
         }
@@ -804,7 +804,7 @@ TMnet_findDescendants (TM_ARGDECL
     assert(descendantBitmapPtr->numBit == vector_getSize(nodeVectorPtr));
 
     PBITMAP_CLEARALL(descendantBitmapPtr);
-    PQUEUE_CLEAR(workQueuePtr);
+    TMQUEUE_CLEAR(workQueuePtr);
 
     {
         net_node_t* nodePtr = (net_node_t*)vector_at(nodeVectorPtr, id);
@@ -815,15 +815,15 @@ TMnet_findDescendants (TM_ARGDECL
             long childId = (long)TMLIST_ITER_NEXT(&it, childIdListPtr);
             status = PBITMAP_SET(descendantBitmapPtr, childId);
             assert(status);
-            status = PQUEUE_PUSH(workQueuePtr, (void*)childId);
+            status = TMQUEUE_PUSH(workQueuePtr, (void*)childId);
             assert(status);
         }
     }
 
-    while (!PQUEUE_ISEMPTY(workQueuePtr)) {
-        long childId = (long)PQUEUE_POP(workQueuePtr);
+    while (!TMQUEUE_ISEMPTY(workQueuePtr)) {
+        long childId = (long)TMQUEUE_POP(workQueuePtr);
         if (childId == id) {
-            queue_clear(workQueuePtr);
+            TMQUEUE_CLEAR(workQueuePtr);
             return FALSE;
         }
         net_node_t* nodePtr = (net_node_t*)vector_at(nodeVectorPtr, childId);
@@ -835,7 +835,7 @@ TMnet_findDescendants (TM_ARGDECL
             if (!PBITMAP_ISSET(descendantBitmapPtr, grandChildId)) {
                 status = PBITMAP_SET(descendantBitmapPtr, grandChildId);
                 assert(status);
-                status = PQUEUE_PUSH(workQueuePtr, (void*)grandChildId);
+                status = TMQUEUE_PUSH(workQueuePtr, (void*)grandChildId);
                 assert(status);
             }
         }

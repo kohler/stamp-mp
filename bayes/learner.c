@@ -542,9 +542,9 @@ populateParentQueryVector (net_t* netPtr,
 
     list_t* parentIdListPtr = net_getParentIdListPtr(netPtr, id);
     list_iter_t it;
-    list_iter_reset(&it, parentIdListPtr);
+    TMlist_iter_reset(&it, parentIdListPtr);
     while (list_iter_hasNext(&it, parentIdListPtr)) {
-        long parentId = (long)list_iter_next(&it, parentIdListPtr);
+        long parentId = (long)TMlist_iter_next(&it, parentIdListPtr);
         bool_t status = vector_pushBack(parentQueryVectorPtr,
                                         (void*)&queries[parentId]);
         assert(status);
@@ -621,7 +621,7 @@ TMpopulateQueryVectors (TM_ARGDECL
     assert(status);
     status = PVECTOR_PUSHBACK(queryVectorPtr, (void*)&queries[id]);
     assert(status);
-    PVECTOR_SORT(queryVectorPtr, &compareQuery);
+    TMvector_sort(queryVectorPtr, &compareQuery);
 }
 
 
@@ -747,7 +747,7 @@ TMfindBestInsertTask (TM_ARGDECL  findBestTaskArg_t* argPtr)
     assert(status);
     status = PVECTOR_PUSHBACK(baseQueryVectorPtr, (void*)&queries[toId]);
     assert(status);
-    PVECTOR_SORT(queryVectorPtr, &compareQuery);
+    TMvector_sort(queryVectorPtr, &compareQuery);
 
     /*
      * Search all possible valid operations for better local log likelihood
@@ -787,13 +787,13 @@ TMfindBestInsertTask (TM_ARGDECL  findBestTaskArg_t* argPtr)
             assert(status);
             status = PVECTOR_PUSHBACK(queryVectorPtr, (void*)&queries[fromId]);
             assert(status);
-            PVECTOR_SORT(queryVectorPtr, &compareQuery);
+            TMvector_sort(queryVectorPtr, &compareQuery);
 
             status = PVECTOR_COPY(parentQueryVectorPtr, baseParentQueryVectorPtr);
             assert(status);
             status = PVECTOR_PUSHBACK(parentQueryVectorPtr, (void*)&queries[fromId]);
             assert(status);
-            PVECTOR_SORT(parentQueryVectorPtr, &compareQuery);
+            TMvector_sort(parentQueryVectorPtr, &compareQuery);
 
             float newLocalLogLikelihood =
                 computeLocalLogLikelihood(toId,
@@ -904,7 +904,7 @@ TMfindBestRemoveTask (TM_ARGDECL  findBestTaskArg_t* argPtr)
         assert(status);
         status = PVECTOR_PUSHBACK(queryVectorPtr, (void*)&queries[toId]);
         assert(status);
-        PVECTOR_SORT(queryVectorPtr, &compareQuery);
+        TMvector_sort(queryVectorPtr, &compareQuery);
 
         /*
          * See if removing parent is better
@@ -1030,7 +1030,7 @@ TMfindBestReverseTask (TM_ARGDECL  findBestTaskArg_t* argPtr)
         assert(status);
         status = PVECTOR_PUSHBACK(queryVectorPtr, (void*)&queries[toId]);
         assert(status);
-        PVECTOR_SORT(queryVectorPtr, &compareQuery);
+        TMvector_sort(queryVectorPtr, &compareQuery);
 
         /*
          * Get log likelihood for removing parent from toId
@@ -1052,13 +1052,13 @@ TMfindBestReverseTask (TM_ARGDECL  findBestTaskArg_t* argPtr)
         assert(status);
         status = PVECTOR_PUSHBACK(parentQueryVectorPtr, (void*)&queries[toId]);
         assert(status);
-        PVECTOR_SORT(parentQueryVectorPtr, &compareQuery);
+        TMvector_sort(parentQueryVectorPtr, &compareQuery);
 
         status = PVECTOR_COPY(queryVectorPtr, parentQueryVectorPtr);
         assert(status);
         status = PVECTOR_PUSHBACK(queryVectorPtr, (void*)&queries[fromId]);
         assert(status);
-        PVECTOR_SORT(queryVectorPtr, &compareQuery);
+        TMvector_sort(queryVectorPtr, &compareQuery);
 
         newLocalLogLikelihood +=
             computeLocalLogLikelihood(fromId,

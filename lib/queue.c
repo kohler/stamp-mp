@@ -227,6 +227,13 @@ queue_clear (queue_t* queuePtr)
     queuePtr->push = 0;
 }
 
+void
+TMqueue_clear (queue_t* queuePtr)
+{
+    queuePtr->pop  = queuePtr->capacity - 1;
+    queuePtr->push = 0;
+}
+
 
 /* =============================================================================
  * TMqueue_isEmpty

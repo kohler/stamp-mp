@@ -158,6 +158,10 @@ TMqueue_isEmpty (TM_ARGDECL  queue_t* queuePtr);
 void
 queue_clear (queue_t* queuePtr);
 
+TM_CALLABLE
+void
+TMqueue_clear (queue_t* queuePtr);
+
 
 /* =============================================================================
  * queue_shuffle
@@ -220,6 +224,7 @@ TMqueue_pop (TM_ARGDECL  queue_t* queuePtr);
 #define TMQUEUE_ALLOC(c)    TMqueue_alloc(TM_ARG_ALONE  c)
 #define TMQUEUE_FREE(q)     TMqueue_free(TM_ARG  q)
 #define TMQUEUE_ISEMPTY(q)  TMqueue_isEmpty(TM_ARG  q)
+#define TMQUEUE_CLEAR(q)    TMqueue_clear(TM_ARG q)
 #define TMQUEUE_PUSH(q, d)  TMqueue_push(TM_ARG  q, (void*)(d))
 #define TMQUEUE_POP(q)      TMqueue_pop(TM_ARG  q)
 
