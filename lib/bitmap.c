@@ -105,7 +105,7 @@ bitmap_alloc (long numBit)
     if (bitmapPtr->bits == NULL) {
         return NULL;
     }
-    memset(bitmapPtr->bits, 0, (numWord * sizeof(ulong_t)));
+    __builtin_memset(bitmapPtr->bits, 0, (numWord * sizeof(ulong_t)));
 
     return bitmapPtr;
 }
@@ -135,7 +135,7 @@ Pbitmap_alloc (long numBit)
         free(bitmapPtr);
         return NULL;
     }
-    memset(bitmapPtr->bits, 0, (numWord * sizeof(ulong_t)));
+    __builtin_memset(bitmapPtr->bits, 0, (numWord * sizeof(ulong_t)));
 
     return bitmapPtr;
 }
@@ -212,7 +212,7 @@ bitmap_clear (bitmap_t* bitmapPtr, long i)
 void
 bitmap_clearAll (bitmap_t* bitmapPtr)
 {
-    memset(bitmapPtr->bits, 0, (bitmapPtr->numWord * sizeof(ulong_t)));
+    __builtin_memset(bitmapPtr->bits, 0, (bitmapPtr->numWord * sizeof(ulong_t)));
 }
 
 

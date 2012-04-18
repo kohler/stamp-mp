@@ -340,7 +340,7 @@ vector_copy (vector_t* dstVectorPtr, vector_t* srcVectorPtr)
         dstVectorPtr->capacity = srcCapacity;
     }
 
-    memcpy(dstVectorPtr->elements,
+    __builtin_memcpy(dstVectorPtr->elements,
            srcVectorPtr->elements,
            (srcSize * sizeof(void*)));
     dstVectorPtr->size = srcSize;
@@ -369,7 +369,7 @@ Pvector_copy (vector_t* dstVectorPtr, vector_t* srcVectorPtr)
         dstVectorPtr->capacity = srcCapacity;
     }
 
-    memcpy(dstVectorPtr->elements,
+    __builtin_memcpy(dstVectorPtr->elements,
            srcVectorPtr->elements,
            (srcSize * sizeof(void*)));
     dstVectorPtr->size = srcSize;
