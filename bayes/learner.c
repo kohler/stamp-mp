@@ -510,7 +510,7 @@ createTaskList (void* argPtr)
  * -- Returns NULL is list is empty
  * =============================================================================
  */
-learner_task_t*
+static learner_task_t*
 TMpopTask (TM_ARGDECL  list_t* taskListPtr)
 {
     learner_task_t* taskPtr = NULL;
