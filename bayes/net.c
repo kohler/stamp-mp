@@ -117,6 +117,7 @@ compareId (const void* aPtr, const void* bPtr)
  * allocNode
  * =============================================================================
  */
+TM_CALLABLE
 static net_node_t*
 allocNode (long id)
 {
@@ -124,14 +125,14 @@ allocNode (long id)
 
     nodePtr = (net_node_t*)malloc(sizeof(net_node_t));
     if (nodePtr) {
-        nodePtr->parentIdListPtr = list_alloc(&compareId);
+        nodePtr->parentIdListPtr = TMlist_alloc(&compareId);
         if (nodePtr->parentIdListPtr == NULL) {
             free(nodePtr);
             return NULL;
         }
-        nodePtr->childIdListPtr = list_alloc(&compareId);
+        nodePtr->childIdListPtr = TMlist_alloc(&compareId);
         if (nodePtr->childIdListPtr == NULL) {
-            list_free(nodePtr->parentIdListPtr);
+            TMlist_free(nodePtr->parentIdListPtr);
             free(nodePtr);
             return NULL;
         }
@@ -146,11 +147,12 @@ allocNode (long id)
  * freeNode
  * =============================================================================
  */
+TM_CALLABLE
 static void
 freeNode (net_node_t* nodePtr)
 {
-    Plist_free(nodePtr->childIdListPtr);
-    Plist_free(nodePtr->parentIdListPtr);
+    TMlist_free(nodePtr->childIdListPtr);
+    TMlist_free(nodePtr->parentIdListPtr);
     free(nodePtr);
 }
 
@@ -217,6 +219,7 @@ net_free (net_t* netPtr)
  * insertEdge
  * =============================================================================
  */
+TM_CALLABLE
 static void
 insertEdge (net_t* netPtr, long fromId, long toId)
 {
@@ -225,12 +228,12 @@ insertEdge (net_t* netPtr, long fromId, long toId)
 
     net_node_t* childNodePtr = (net_node_t*)vector_at(nodeVectorPtr, toId);
     list_t* parentIdListPtr = childNodePtr->parentIdListPtr;
-    status = list_insert(parentIdListPtr, (void*)fromId);
+    status = TMlist_insert(parentIdListPtr, (void*)fromId);
     assert(status);
 
     net_node_t* parentNodePtr = (net_node_t*)vector_at(nodeVectorPtr, fromId);
     list_t* childIdListPtr = parentNodePtr->childIdListPtr;
-    status = list_insert(childIdListPtr, (void*)toId);
+    status = TMlist_insert(childIdListPtr, (void*)toId);
     assert(status);
 }
 
@@ -371,15 +374,17 @@ net_hasEdge (net_t* netPtr, long fromId, long toId)
     net_node_t* childNodePtr = (net_node_t*)vector_at(nodeVectorPtr, toId);
     list_t* parentIdListPtr = childNodePtr->parentIdListPtr;
 
-    list_iter_t it;
-    list_iter_reset(&it, parentIdListPtr);
-    while (list_iter_hasNext(&it, parentIdListPtr)) {
-        long parentId = (long)list_iter_next(&it, parentIdListPtr);
+    list_iter_t *it = malloc(sizeof(*it));
+    TMlist_iter_reset(it, parentIdListPtr);
+    while (list_iter_hasNext(it, parentIdListPtr)) {
+        long parentId = (long)TMlist_iter_next(it, parentIdListPtr);
         if (parentId == fromId) {
+	    free(it);
             return TRUE;
         }
     }
 
+    free(it);
     return FALSE;
 }
 
@@ -395,15 +400,17 @@ TMnet_hasEdge (TM_ARGDECL  net_t* netPtr, long fromId, long toId)
     net_node_t* childNodePtr = (net_node_t*)vector_at(nodeVectorPtr, toId);
     list_t* parentIdListPtr = childNodePtr->parentIdListPtr;
 
-    list_iter_t it;
-    TMLIST_ITER_RESET(&it, parentIdListPtr);
-    while (TMLIST_ITER_HASNEXT(&it, parentIdListPtr)) {
-        long parentId = (long)TMLIST_ITER_NEXT(&it, parentIdListPtr);
+    list_iter_t *it = malloc(sizeof(*it));
+    TMLIST_ITER_RESET(it, parentIdListPtr);
+    while (TMLIST_ITER_HASNEXT(it, parentIdListPtr)) {
+        long parentId = (long)TMLIST_ITER_NEXT(it, parentIdListPtr);
         if (parentId == fromId) {
+	    free(it);
             return TRUE;
         }
     }
 
+    free(it);
     return FALSE;
 }
 
@@ -425,30 +432,31 @@ net_isPath (net_t* netPtr,
     assert(visitedBitmapPtr->numBit == vector_getSize(nodeVectorPtr));
 
     bitmap_clearAll(visitedBitmapPtr);
-    queue_clear(workQueuePtr);
+    TMqueue_clear(workQueuePtr);
 
-    status = queue_push(workQueuePtr, (void*)fromId);
+    status = TMqueue_push(workQueuePtr, (void*)fromId);
     assert(status);
 
-    while (!queue_isEmpty(workQueuePtr)) {
-        long id = (long)queue_pop(workQueuePtr);
+    while (!TMqueue_isEmpty(workQueuePtr)) {
+        long id = (long)TMqueue_pop(workQueuePtr);
         if (id == toId) {
-            queue_clear(workQueuePtr);
+            TMqueue_clear(workQueuePtr);
             return TRUE;
         }
         status = bitmap_set(visitedBitmapPtr, id);
         assert(status);
         net_node_t* nodePtr = (net_node_t*)vector_at(nodeVectorPtr, id);
         list_t* childIdListPtr = nodePtr->childIdListPtr;
-        list_iter_t it;
-        list_iter_reset(&it, childIdListPtr);
-        while (list_iter_hasNext(&it, childIdListPtr)) {
-            long childId = (long)list_iter_next(&it, childIdListPtr);
+        list_iter_t *it = malloc(sizeof(*it));
+        TMlist_iter_reset(it, childIdListPtr);
+        while (list_iter_hasNext(it, childIdListPtr)) {
+            long childId = (long)TMlist_iter_next(it, childIdListPtr);
             if (!bitmap_isSet(visitedBitmapPtr, childId)) {
-                status = queue_push(workQueuePtr, (void*)childId);
+                status = TMqueue_push(workQueuePtr, (void*)childId);
                 assert(status);
             }
         }
+	free(it);
     }
 
     return FALSE;
@@ -488,15 +496,16 @@ TMnet_isPath (TM_ARGDECL
         assert(status);
         net_node_t* nodePtr = (net_node_t*)vector_at(nodeVectorPtr, id);
         list_t* childIdListPtr = nodePtr->childIdListPtr;
-        list_iter_t it;
-        TMLIST_ITER_RESET(&it, childIdListPtr);
-        while (TMLIST_ITER_HASNEXT(&it, childIdListPtr)) {
-            long childId = (long)TMLIST_ITER_NEXT(&it, childIdListPtr);
+        list_iter_t *it = malloc(sizeof(*it));
+        TMLIST_ITER_RESET(it, childIdListPtr);
+        while (TMLIST_ITER_HASNEXT(it, childIdListPtr)) {
+            long childId = (long)TMLIST_ITER_NEXT(it, childIdListPtr);
             if (!PBITMAP_ISSET(visitedBitmapPtr, childId)) {
                 status = TMQUEUE_PUSH(workQueuePtr, (void*)childId);
                 assert(status);
             }
         }
+	free(it);
     }
 
     return FALSE;
@@ -507,6 +516,7 @@ TMnet_isPath (TM_ARGDECL
  * isCycle
  * =============================================================================
  */
+TM_CALLABLE
 static bool_t
 isCycle (vector_t* nodeVectorPtr, net_node_t* nodePtr)
 {
@@ -514,16 +524,18 @@ isCycle (vector_t* nodeVectorPtr, net_node_t* nodePtr)
         case NET_NODE_MARK_INIT: {
             nodePtr->mark = NET_NODE_MARK_TEST;
             list_t* childIdListPtr = nodePtr->childIdListPtr;
-            list_iter_t it;
-            list_iter_reset(&it, childIdListPtr);
-            while (list_iter_hasNext(&it, childIdListPtr)) {
-                long childId = (long)list_iter_next(&it, childIdListPtr);
+	    list_iter_t *it = malloc(sizeof(*it));
+	    TMlist_iter_reset(it, childIdListPtr);
+            while (list_iter_hasNext(it, childIdListPtr)) {
+                long childId = (long)TMlist_iter_next(it, childIdListPtr);
                 net_node_t* childNodePtr =
                     (net_node_t*)vector_at(nodeVectorPtr, childId);
                 if (isCycle(nodeVectorPtr, childNodePtr)) {
+		    free(it);
                     return TRUE;
                 }
             }
+	    free(it);
             break;
         }
         case NET_NODE_MARK_TEST:
@@ -630,15 +642,16 @@ net_findAncestors (net_t* netPtr,
     {
         net_node_t* nodePtr = (net_node_t*)vector_at(nodeVectorPtr, id);
         list_t* parentIdListPtr = nodePtr->parentIdListPtr;
-        list_iter_t it;
-        list_iter_reset(&it, parentIdListPtr);
-        while (list_iter_hasNext(&it, parentIdListPtr)) {
-            long parentId = (long)list_iter_next(&it, parentIdListPtr);
+        list_iter_t *it = malloc(sizeof(*it));
+        list_iter_reset(it, parentIdListPtr);
+        while (list_iter_hasNext(it, parentIdListPtr)) {
+            long parentId = (long)list_iter_next(it, parentIdListPtr);
             status = bitmap_set(ancestorBitmapPtr, parentId);
             assert(status);
             status = queue_push(workQueuePtr, (void*)parentId);
             assert(status);
         }
+	free(it);
     }
 
     while (!queue_isEmpty(workQueuePtr)) {
@@ -649,10 +662,10 @@ net_findAncestors (net_t* netPtr,
         }
         net_node_t* nodePtr = (net_node_t*)vector_at(nodeVectorPtr, parentId);
         list_t* grandParentIdListPtr = nodePtr->parentIdListPtr;
-        list_iter_t it;
-        list_iter_reset(&it, grandParentIdListPtr);
-        while (list_iter_hasNext(&it, grandParentIdListPtr)) {
-            long grandParentId = (long)list_iter_next(&it, grandParentIdListPtr);
+        list_iter_t *it = malloc(sizeof(*it));
+        list_iter_reset(it, grandParentIdListPtr);
+        while (list_iter_hasNext(it, grandParentIdListPtr)) {
+            long grandParentId = (long)list_iter_next(it, grandParentIdListPtr);
             if (!bitmap_isSet(ancestorBitmapPtr, grandParentId)) {
                 status = bitmap_set(ancestorBitmapPtr, grandParentId);
                 assert(status);
@@ -690,15 +703,16 @@ TMnet_findAncestors (TM_ARGDECL
     {
         net_node_t* nodePtr = (net_node_t*)vector_at(nodeVectorPtr, id);
         list_t* parentIdListPtr = nodePtr->parentIdListPtr;
-        list_iter_t it;
-        TMLIST_ITER_RESET(&it, parentIdListPtr);
-        while (TMLIST_ITER_HASNEXT(&it, parentIdListPtr)) {
-            long parentId = (long)TMLIST_ITER_NEXT(&it, parentIdListPtr);
+        list_iter_t *it = malloc(sizeof(*it));
+        TMLIST_ITER_RESET(it, parentIdListPtr);
+        while (TMLIST_ITER_HASNEXT(it, parentIdListPtr)) {
+            long parentId = (long)TMLIST_ITER_NEXT(it, parentIdListPtr);
             status = PBITMAP_SET(ancestorBitmapPtr, parentId);
             assert(status);
             status = PQUEUE_PUSH(workQueuePtr, (void*)parentId);
             assert(status);
         }
+	free(it);
     }
 
     while (!PQUEUE_ISEMPTY(workQueuePtr)) {
@@ -709,10 +723,10 @@ TMnet_findAncestors (TM_ARGDECL
         }
         net_node_t* nodePtr = (net_node_t*)vector_at(nodeVectorPtr, parentId);
         list_t* grandParentIdListPtr = nodePtr->parentIdListPtr;
-        list_iter_t it;
-        TMLIST_ITER_RESET(&it, grandParentIdListPtr);
-        while (TMLIST_ITER_HASNEXT(&it, grandParentIdListPtr)) {
-            long grandParentId = (long)TMLIST_ITER_NEXT(&it, grandParentIdListPtr);
+        list_iter_t *it = malloc(sizeof(*it));
+        TMLIST_ITER_RESET(it, grandParentIdListPtr);
+        while (TMLIST_ITER_HASNEXT(it, grandParentIdListPtr)) {
+            long grandParentId = (long)TMLIST_ITER_NEXT(it, grandParentIdListPtr);
             if (!PBITMAP_ISSET(ancestorBitmapPtr, grandParentId)) {
                 status = PBITMAP_SET(ancestorBitmapPtr, grandParentId);
                 assert(status);
@@ -720,6 +734,7 @@ TMnet_findAncestors (TM_ARGDECL
                 assert(status);
             }
         }
+	free(it);
     }
 
     return TRUE;
@@ -749,15 +764,16 @@ net_findDescendants (net_t* netPtr,
     {
         net_node_t* nodePtr = (net_node_t*)vector_at(nodeVectorPtr, id);
         list_t* childIdListPtr = nodePtr->childIdListPtr;
-        list_iter_t it;
-        list_iter_reset(&it, childIdListPtr);
-        while (list_iter_hasNext(&it, childIdListPtr)) {
-            long childId = (long)list_iter_next(&it, childIdListPtr);
+        list_iter_t *it = malloc(sizeof(*it));
+        list_iter_reset(it, childIdListPtr);
+        while (list_iter_hasNext(it, childIdListPtr)) {
+            long childId = (long)list_iter_next(it, childIdListPtr);
             status = bitmap_set(descendantBitmapPtr, childId);
             assert(status);
             status = queue_push(workQueuePtr, (void*)childId);
             assert(status);
         }
+	free(it);
     }
 
     while (!queue_isEmpty(workQueuePtr)) {
@@ -768,10 +784,10 @@ net_findDescendants (net_t* netPtr,
         }
         net_node_t* nodePtr = (net_node_t*)vector_at(nodeVectorPtr, childId);
         list_t* grandChildIdListPtr = nodePtr->childIdListPtr;
-        list_iter_t it;
-        list_iter_reset(&it, grandChildIdListPtr);
-        while (list_iter_hasNext(&it, grandChildIdListPtr)) {
-            long grandChildId = (long)list_iter_next(&it, grandChildIdListPtr);
+        list_iter_t *it = malloc(sizeof(*it));
+        list_iter_reset(it, grandChildIdListPtr);
+        while (list_iter_hasNext(it, grandChildIdListPtr)) {
+            long grandChildId = (long)list_iter_next(it, grandChildIdListPtr);
             if (!bitmap_isSet(descendantBitmapPtr, grandChildId)) {
                 status = bitmap_set(descendantBitmapPtr, grandChildId);
                 assert(status);
@@ -779,6 +795,7 @@ net_findDescendants (net_t* netPtr,
                 assert(status);
             }
         }
+	free(it);
     }
 
     return TRUE;
@@ -809,15 +826,16 @@ TMnet_findDescendants (TM_ARGDECL
     {
         net_node_t* nodePtr = (net_node_t*)vector_at(nodeVectorPtr, id);
         list_t* childIdListPtr = nodePtr->childIdListPtr;
-        list_iter_t it;
-        TMLIST_ITER_RESET(&it, childIdListPtr);
-        while (TMLIST_ITER_HASNEXT(&it, childIdListPtr)) {
-            long childId = (long)TMLIST_ITER_NEXT(&it, childIdListPtr);
+        list_iter_t *it = malloc(sizeof(*it));
+        TMLIST_ITER_RESET(it, childIdListPtr);
+        while (TMLIST_ITER_HASNEXT(it, childIdListPtr)) {
+            long childId = (long)TMLIST_ITER_NEXT(it, childIdListPtr);
             status = PBITMAP_SET(descendantBitmapPtr, childId);
             assert(status);
             status = TMQUEUE_PUSH(workQueuePtr, (void*)childId);
             assert(status);
         }
+	free(it);
     }
 
     while (!TMQUEUE_ISEMPTY(workQueuePtr)) {
@@ -828,10 +846,10 @@ TMnet_findDescendants (TM_ARGDECL
         }
         net_node_t* nodePtr = (net_node_t*)vector_at(nodeVectorPtr, childId);
         list_t* grandChildIdListPtr = nodePtr->childIdListPtr;
-        list_iter_t it;
-        TMLIST_ITER_RESET(&it, grandChildIdListPtr);
-        while (TMLIST_ITER_HASNEXT(&it, grandChildIdListPtr)) {
-            long grandChildId = (long)TMLIST_ITER_NEXT(&it, grandChildIdListPtr);
+        list_iter_t *it = malloc(sizeof(*it));
+        TMLIST_ITER_RESET(it, grandChildIdListPtr);
+        while (TMLIST_ITER_HASNEXT(it, grandChildIdListPtr)) {
+            long grandChildId = (long)TMLIST_ITER_NEXT(it, grandChildIdListPtr);
             if (!PBITMAP_ISSET(descendantBitmapPtr, grandChildId)) {
                 status = PBITMAP_SET(descendantBitmapPtr, grandChildId);
                 assert(status);
@@ -839,6 +857,7 @@ TMnet_findDescendants (TM_ARGDECL
                 assert(status);
             }
         }
+	free(it);
     }
 
     return TRUE;
@@ -860,7 +879,7 @@ net_generateRandomEdges (net_t* netPtr,
     long numNode = vector_getSize(nodeVectorPtr);
     bitmap_t* visitedBitmapPtr = bitmap_alloc(numNode);
     assert(visitedBitmapPtr);
-    queue_t* workQueuePtr = queue_alloc(-1);
+    queue_t* workQueuePtr = TMqueue_alloc(-1);
 
     long n;
 
@@ -886,7 +905,7 @@ net_generateRandomEdges (net_t* netPtr,
     assert(!net_isCycle(netPtr));
 
     bitmap_free(visitedBitmapPtr);
-    queue_free(workQueuePtr);
+    TMqueue_free(workQueuePtr);
 }
 
 

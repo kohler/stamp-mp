@@ -137,11 +137,15 @@
 
 #define TM_START(ro)                 /* nothing */
 #define TM_BEGIN()                __transaction_atomic {
-#define TM_BEGIN_RO()             __transaction_atomic {k  TM_START(1)
+#define TM_BEGIN_RO()             __transaction_atomic {
 #define TM_END()                  }
 #define TM_RESTART()              transaction_cancel
+#define TM_SETUP_BEGIN()          __transaction_atomic {
+#define TM_SETUP_END()            }  
 
 #define TM_EARLY_RELEASE(var)       /* nothing */
+
+TM_CALLABLE void tm_printf(const char *format, ...);
 
 /* =============================================================================
  * Transactional Memory System interface for shared memory accesses

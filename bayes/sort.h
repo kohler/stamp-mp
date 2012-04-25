@@ -102,17 +102,18 @@
 
 #ifndef SORT_H
 #define SORT_H 1
-
+#include "tm.h"
 
 /* =============================================================================
  * sort
  * =============================================================================
  */
+TM_CALLABLE
 void
 sort (void* base,
       unsigned num,
       unsigned width,
-      int (*cmp)(const void* p1, const void* p2, long n, long offset),
+      TM_CALLABLE int (*cmp)(const void* p1, const void* p2, long n, long offset),
       long n,
       long offset);
 

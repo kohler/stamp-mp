@@ -172,7 +172,7 @@ void init_by_array(unsigned long mt[], unsigned long * mtiPtr, unsigned long ini
 unsigned long genrand_int32(unsigned long mt[], unsigned long * mtiPtr)
 {
     unsigned long y;
-    static unsigned long mag01[2]={0x0UL, MATRIX_A};
+    static const unsigned long mag01[2]={0x0UL, MATRIX_A};
     unsigned long mti = (*mtiPtr);
 
     /* mag01[x] = x * MATRIX_A  for x=0,1 */

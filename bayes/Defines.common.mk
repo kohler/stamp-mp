@@ -10,6 +10,7 @@ PROG := bayes
 LIB_SRCS := \
 	$(LIB)/bitmap.c \
 	$(LIB)/list.c \
+	$(LIB)/list1.c \
 	$(LIB)/mt19937ar.c \
 	$(LIB)/queue.c \
 	$(LIB)/random.c \

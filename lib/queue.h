@@ -106,6 +106,7 @@ Pqueue_alloc (long initCapacity);
  * TMqueue_alloc
  * =============================================================================
  */
+TM_CALLABLE
 queue_t*
 TMqueue_alloc (TM_ARGDECL  long initCapacity);
 
@@ -130,6 +131,7 @@ Pqueue_free (queue_t* queuePtr);
  * TMqueue_free
  * =============================================================================
  */
+TM_CALLABLE
 void
 TMqueue_free (TM_ARGDECL  queue_t* queuePtr);
 

@@ -95,6 +95,7 @@ allocNode (long index)
 {
     adtree_node_t* nodePtr;
 
+    TM_SETUP_BEGIN();
     nodePtr = (adtree_node_t*)malloc(sizeof(adtree_node_t));
     if (nodePtr) {
         nodePtr->varyVectorPtr = vector_alloc(1);
@@ -106,6 +107,7 @@ allocNode (long index)
         nodePtr->value = -1;
         nodePtr->count = -1;
     }
+    TM_SETUP_END();
 
     return nodePtr;
 }
@@ -132,6 +134,7 @@ allocVary (long index)
 {
     adtree_vary_t* varyPtr;
 
+    TM_SETUP_BEGIN();
     varyPtr = (adtree_vary_t*)malloc(sizeof(adtree_vary_t));
     if (varyPtr) {
         varyPtr->index = index;
@@ -139,6 +142,7 @@ allocVary (long index)
         varyPtr->zeroNodePtr = NULL;
         varyPtr->oneNodePtr = NULL;
     }
+    TM_SETUP_END();
 
     return varyPtr;
 }
@@ -164,6 +168,7 @@ adtree_alloc ()
 {
     adtree_t* adtreePtr;
 
+    TM_SETUP_BEGIN();
     adtreePtr = (adtree_t*)malloc(sizeof(adtree_t));
     if (adtreePtr) {
         adtreePtr->numVar = -1L;
@@ -171,6 +176,7 @@ adtree_alloc ()
         adtreePtr->rootNodePtr = NULL;
     }
 
+    TM_SETUP_END();
     return adtreePtr;
 }
 
@@ -204,11 +210,14 @@ freeNodes (adtree_node_t* nodePtr)
 void
 adtree_free (adtree_t* adtreePtr)
 {
+    TM_SETUP_BEGIN();
     freeNodes(adtreePtr->rootNodePtr);
     free(adtreePtr);
+    TM_SETUP_END();
 }
 
 
+TM_CALLABLE
 static adtree_vary_t*
 makeVary (long parentIndex,
           long index,
@@ -216,6 +225,7 @@ makeVary (long parentIndex,
           long numRecord,
           data_t* dataPtr);
 
+TM_CALLABLE
 static adtree_node_t*
 makeNode (long parentIndex,
           long index,
@@ -246,6 +256,7 @@ makeVary (long parentIndex,
     long num1 = numRecord - num0;
 
     long mostCommonValue = ((num0 >= num1) ? 0 : 1);
+    TM_SETUP_BEGIN();
     varyPtr->mostCommonValue = mostCommonValue;
 
     if (num0 == 0 || mostCommonValue == 0) {
@@ -255,13 +266,18 @@ makeVary (long parentIndex,
             makeNode(index, index, start, num0, dataPtr);
         varyPtr->zeroNodePtr->value = 0;
     }
+    TM_SETUP_END();
 
     if (num1 == 0 || mostCommonValue == 1) {
+	TM_SETUP_BEGIN();
         varyPtr->oneNodePtr = NULL;
+	TM_SETUP_END();
     } else {
-        varyPtr->oneNodePtr =
-            makeNode(index, index, (start + num0), num1, dataPtr);
+	adtree_node_t*tmpNodePtr = makeNode(index, index, (start + num0), num1, dataPtr);
+	TM_SETUP_BEGIN();
+        varyPtr->oneNodePtr = tmpNodePtr;
         varyPtr->oneNodePtr->value = 1;
+	TM_SETUP_END();
     }
 
     return varyPtr;
@@ -282,18 +298,22 @@ makeNode (long parentIndex,
     adtree_node_t* nodePtr = allocNode(index);
     assert(nodePtr);
 
+    TM_SETUP_BEGIN();
     nodePtr->count = numRecord;
+    TM_SETUP_END();
 
-    vector_t* varyVectorPtr = nodePtr->varyVectorPtr;
+    vector_t* varyVectorPtr = __transaction_atomic(nodePtr->varyVectorPtr);
 
     long v;
-    long numVar = dataPtr->numVar;
+    long numVar = __transaction_atomic(dataPtr->numVar);
     for (v = (index + 1); v < numVar; v++) {
         adtree_vary_t* varyPtr =
             makeVary(parentIndex, v, start, numRecord, dataPtr);
         assert(varyPtr);
+	TM_SETUP_BEGIN();
         bool_t status = vector_pushBack(varyVectorPtr, (void*)varyPtr);
         assert(status);
+	TM_SETUP_END();
     }
 
     return nodePtr;
@@ -308,11 +328,17 @@ makeNode (long parentIndex,
 void
 adtree_make (adtree_t* adtreePtr, data_t* dataPtr)
 {
-    long numRecord = dataPtr->numRecord;
-    adtreePtr->numVar = dataPtr->numVar;
-    adtreePtr->numRecord = dataPtr->numRecord;
+    long numRecord = __transaction_atomic(dataPtr->numRecord);
+    long numVar = __transaction_atomic(dataPtr->numVar);
+    TM_SETUP_BEGIN();
+    adtreePtr->numVar = numVar;
+    adtreePtr->numRecord = numRecord;
+    TM_SETUP_END();
     data_sort(dataPtr, 0, numRecord, 0);
-    adtreePtr->rootNodePtr = makeNode(-1, -1, 0, numRecord, dataPtr);
+    adtree_node_t* rootNodePtr = makeNode(-1, -1, 0, numRecord, dataPtr);
+    TM_SETUP_BEGIN();
+    adtreePtr->rootNodePtr = rootNodePtr;
+    TM_SETUP_END();
 }
 
 

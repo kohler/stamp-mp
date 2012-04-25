@@ -97,6 +97,12 @@ typedef struct learner {
     char pad5[CACHE_LINE_SIZE - sizeof(long)];
 } learner_t;
 
+struct learner_task {
+    operation_t op;
+    long fromId;
+    long toId;
+    float score;
+};
 
 /* =============================================================================
  * learner_alloc

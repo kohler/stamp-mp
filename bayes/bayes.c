@@ -211,18 +211,21 @@ score (net_t* netPtr, adtree_t* adtreePtr)
 
     learner_t* learnerPtr = learner_alloc(dataPtr, adtreePtr, 1);
 
-    net_t* tmpNetPtr = learnerPtr->netPtr;
+    net_t* tmpNetPtr = __transaction_atomic(learnerPtr->netPtr);
+    TM_BEGIN();
     learnerPtr->netPtr = netPtr;
+    TM_END();
 
     float score = learner_score(learnerPtr);
 
+    TM_BEGIN();
     learnerPtr->netPtr = tmpNetPtr;
+    TM_END();
     learner_free(learnerPtr);
     data_free(dataPtr);
 
     return score;
 }
-
 
 /* =============================================================================
  * main
@@ -264,9 +267,11 @@ MAIN(argc, argv)
     printf("Generating data... ");
     fflush(stdout);
 
-    random_t* randomPtr = random_alloc();
+    random_t* randomPtr = __transaction_atomic(random_alloc());
     assert(randomPtr);
+    TM_SETUP_BEGIN();
     random_seed(randomPtr, randomSeed);
+    TM_SETUP_END();
 
     data_t* dataPtr = data_alloc(numVar, numRecord, randomPtr);
     assert(dataPtr);
@@ -303,7 +308,9 @@ MAIN(argc, argv)
      */
 
     float actualScore = score(netPtr, adtreePtr);
+    TM_BEGIN();
     net_free(netPtr);
+    TM_END();
 
     /*
      * Learn structure of Bayesian network
@@ -334,7 +341,7 @@ MAIN(argc, argv)
      * Check solution
      */
 
-    bool_t status = net_isCycle(learnerPtr->netPtr);
+    bool_t status = __transaction_atomic(net_isCycle(learnerPtr->netPtr));
     assert(!status);
 
     float learnScore = learner_score(learnerPtr);
@@ -346,7 +353,9 @@ MAIN(argc, argv)
      */
 
     fflush(stdout);
+    TM_BEGIN();
     random_free(randomPtr);
+    TM_END();
     adtree_free(adtreePtr);
     learner_free(learnerPtr);
 

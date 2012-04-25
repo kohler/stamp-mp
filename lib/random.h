@@ -96,6 +96,7 @@ typedef struct random {
  * -- Returns NULL if failure
  * =============================================================================
  */
+TM_CALLABLE
 random_t*
 random_alloc ();
 
@@ -106,6 +107,7 @@ random_alloc ();
  * -- Returns NULL if failure
  * =============================================================================
  */
+TM_CALLABLE
 random_t*
 Prandom_alloc ();
 
@@ -114,6 +116,7 @@ Prandom_alloc ();
  * random_free
  * =============================================================================
  */
+TM_CALLABLE
 void
 random_free (random_t* randomPtr);
 
@@ -122,6 +125,7 @@ random_free (random_t* randomPtr);
  * Prandom_free
  * =============================================================================
  */
+TM_CALLABLE
 void
 Prandom_free (random_t* randomPtr);
 
@@ -130,6 +134,7 @@ Prandom_free (random_t* randomPtr);
  * random_seed
  * =============================================================================
  */
+TM_CALLABLE
 void
 random_seed (random_t* randomPtr, unsigned long seed);
 
@@ -138,6 +143,7 @@ random_seed (random_t* randomPtr, unsigned long seed);
  * random_generate
  * =============================================================================
  */
+TM_CALLABLE
 unsigned long
 random_generate (random_t* randomPtr);
 

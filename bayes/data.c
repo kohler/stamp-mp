@@ -94,7 +94,8 @@ data_t*
 data_alloc (long numVar, long numRecord, random_t* randomPtr)
 {
     data_t* dataPtr;
-
+    
+    TM_SETUP_BEGIN()
     dataPtr = (data_t*)malloc(sizeof(data_t));
     if (dataPtr) {
         long numDatum = numVar * numRecord;
@@ -103,11 +104,14 @@ data_alloc (long numVar, long numRecord, random_t* randomPtr)
             free(dataPtr);
             return NULL;
         }
-        memset(dataPtr->records, DATA_INIT, (numDatum * sizeof(char)));
+
+        __builtin_memset(dataPtr->records, DATA_INIT, (numDatum * sizeof(char)));
+
         dataPtr->numVar = numVar;
         dataPtr->numRecord = numRecord;
         dataPtr->randomPtr = randomPtr;
     }
+    TM_SETUP_END();
 
     return dataPtr;
 }
@@ -120,8 +124,10 @@ data_alloc (long numVar, long numRecord, random_t* randomPtr)
 void
 data_free (data_t* dataPtr)
 {
+    TM_BEGIN();
     free(dataPtr->records);
     free(dataPtr);
+    TM_END();
 }
 
 
@@ -135,31 +141,36 @@ data_free (data_t* dataPtr)
 net_t*
 data_generate (data_t* dataPtr, long seed, long maxNumParent, long percentParent)
 {
+    net_t *netPtr;
+    TM_SETUP_BEGIN();
     random_t* randomPtr = dataPtr->randomPtr;
     if (seed >= 0) {
         random_seed(randomPtr, seed);
     }
-
+    
     /*
      * Generate random Bayesian network
      */
-
+    
     long numVar = dataPtr->numVar;
-    net_t* netPtr = net_alloc(numVar);
+    char* record = dataPtr->records;
+    long numRecord = dataPtr->numRecord;
+
+    netPtr = net_alloc(numVar);
     assert(netPtr);
     net_generateRandomEdges(netPtr, maxNumParent, percentParent, randomPtr);
-
+    
     /*
      * Create a threshold for each of the possible permutation of variable
      * value instances
      */
-
+    
     long** thresholdsTable = (long**)malloc(numVar * sizeof(long*));
     assert(thresholdsTable);
     long v;
     for (v = 0; v < numVar; v++) {
         list_t* parentIdListPtr = net_getParentIdListPtr(netPtr, v);
-        long numThreshold = 1 << list_getSize(parentIdListPtr);
+        long numThreshold = 1 << TMlist_getSize(parentIdListPtr);
         long* thresholds = (long*)malloc(numThreshold * sizeof(long));
         assert(thresholds);
         long t;
@@ -169,32 +180,32 @@ data_generate (data_t* dataPtr, long seed, long maxNumParent, long percentParent
         }
         thresholdsTable[v] = thresholds;
     }
-
+    
     /*
      * Create variable dependency ordering for record generation
      */
-
+    
     long* order = (long*)malloc(numVar * sizeof(long));
     assert(order);
     long numOrder = 0;
-
-    queue_t* workQueuePtr = queue_alloc(-1);
+    
+    queue_t* workQueuePtr = TMqueue_alloc(-1);
     assert(workQueuePtr);
-
+    
     vector_t* dependencyVectorPtr = vector_alloc(1);
     assert(dependencyVectorPtr);
-
+    
     bitmap_t* orderedBitmapPtr = bitmap_alloc(numVar);
     assert(orderedBitmapPtr);
     bitmap_clearAll(orderedBitmapPtr);
-
+    
     bitmap_t* doneBitmapPtr = bitmap_alloc(numVar);
     assert(doneBitmapPtr);
     bitmap_clearAll(doneBitmapPtr);
     v = -1;
     while ((v = bitmap_findClear(doneBitmapPtr, (v + 1))) >= 0) {
         list_t* childIdListPtr = net_getChildIdListPtr(netPtr, v);
-        long numChild = list_getSize(childIdListPtr);
+        long numChild = TMlist_getSize(childIdListPtr);
         if (numChild == 0) {
 
             bool_t status;
@@ -203,23 +214,24 @@ data_generate (data_t* dataPtr, long seed, long maxNumParent, long percentParent
              * Use breadth-first search to find net connected to this leaf
              */
 
-            queue_clear(workQueuePtr);
-            status = queue_push(workQueuePtr, (void*)v);
+            TMqueue_clear(workQueuePtr);
+            status = TMqueue_push(workQueuePtr, (void*)v);
             assert(status);
-            while (!queue_isEmpty(workQueuePtr)) {
-                long id = (long)queue_pop(workQueuePtr);
+            while (!TMqueue_isEmpty(workQueuePtr)) {
+                long id = (long)TMqueue_pop(workQueuePtr);
                 status = bitmap_set(doneBitmapPtr, id);
                 assert(status);
                 status = vector_pushBack(dependencyVectorPtr, (void*)id);
                 assert(status);
                 list_t* parentIdListPtr = net_getParentIdListPtr(netPtr, id);
-                list_iter_t it;
-                list_iter_reset(&it, parentIdListPtr);
-                while (list_iter_hasNext(&it, parentIdListPtr)) {
-                    long parentId = (long)list_iter_next(&it, parentIdListPtr);
-                    status = queue_push(workQueuePtr, (void*)parentId);
+                list_iter_t *it = malloc(sizeof(*it));
+                TMlist_iter_reset(it, parentIdListPtr);
+                while (list_iter_hasNext(it, parentIdListPtr)) {
+                    long parentId = (long)TMlist_iter_next(it, parentIdListPtr);
+                    status = TMqueue_push(workQueuePtr, (void*)parentId);
                     assert(status);
                 }
+		free(it);
             }
 
             /*
@@ -244,19 +256,17 @@ data_generate (data_t* dataPtr, long seed, long maxNumParent, long percentParent
      * Create records
      */
 
-    char* record = dataPtr->records;
     long r;
-    long numRecord = dataPtr->numRecord;
     for (r = 0; r < numRecord; r++) {
         long o;
         for (o = 0; o < numOrder; o++) {
             long v = order[o];
             list_t* parentIdListPtr = net_getParentIdListPtr(netPtr, v);
             long index = 0;
-            list_iter_t it;
-            list_iter_reset(&it, parentIdListPtr);
-            while (list_iter_hasNext(&it, parentIdListPtr)) {
-                long parentId = (long)list_iter_next(&it, parentIdListPtr);
+            list_iter_t *it = malloc(sizeof(*it));
+            TMlist_iter_reset(it, parentIdListPtr);
+            while (list_iter_hasNext(it, parentIdListPtr)) {
+                long parentId = (long)TMlist_iter_next(it, parentIdListPtr);
                 long value = record[parentId];
                 assert(value != DATA_INIT);
                 index = (index << 1) + value;
@@ -264,9 +274,10 @@ data_generate (data_t* dataPtr, long seed, long maxNumParent, long percentParent
             long rnd = random_generate(randomPtr) % DATA_PRECISION;
             long threshold = thresholdsTable[v][index];
             record[v] = ((rnd < threshold) ? 1 : 0);
+	    free(it);
         }
         record += numVar;
-        assert(record <= (dataPtr->records + numRecord * numVar));
+        // assert(record <= (dataPtr->records + numRecord * numVar));
     }
 
     /*
@@ -276,13 +287,14 @@ data_generate (data_t* dataPtr, long seed, long maxNumParent, long percentParent
     bitmap_free(doneBitmapPtr);
     bitmap_free(orderedBitmapPtr);
     vector_free(dependencyVectorPtr);
-    queue_free(workQueuePtr);
+    TMqueue_free(workQueuePtr);
     free(order);
     for (v = 0; v < numVar; v++) {
         free(thresholdsTable[v]);
     }
     free(thresholdsTable);
-
+    
+    TM_SETUP_END();
     return netPtr;
 }
 
@@ -333,6 +345,8 @@ data_copy (data_t* dstPtr, data_t* srcPtr)
  * compareRecord
  * =============================================================================
  */
+
+TM_CALLABLE
 static int
 compareRecord (const void* p1, const void* p2, long n, long offset)
 {
@@ -351,6 +365,153 @@ compareRecord (const void* p1, const void* p2, long n, long offset)
     return 0;
 }
 
+#define CUTOFF 8
+
+
+/* =============================================================================
+ * swap
+ * =============================================================================
+ */
+static void
+swap (char* a, char* b, unsigned width)
+{
+    if (a != b) {
+        while (width--) {
+            char tmp = *a;
+            *a++ = *b;
+            *b++ = tmp;
+        }
+    }
+}
+
+
+/* =============================================================================
+ * shortsort
+ * =============================================================================
+ */
+TM_CALLABLE
+static void
+data_shortsort (char* lo,
+		char* hi,
+		unsigned width,
+		long n,
+		long offset)
+{
+    while (hi > lo) {
+        char* max = lo;
+        char* p;
+        for (p = (lo + width); p <= hi; p += width) {
+            if (compareRecord(p, max, n, offset) > 0) {
+                max = p;
+            }
+        }
+        swap(max, hi, width);
+        hi -= width;
+    }
+}
+
+
+/* =============================================================================
+ * sort
+ * =============================================================================
+ */
+void
+data_sort2 (void *base,
+      unsigned num,
+      unsigned width,
+      long n,
+      long offset)
+{
+    if (num < 2 || width == 0) {
+        return;
+    }
+
+    char** lostk = malloc(sizeof(char *) * 30);
+    char** histk = malloc(sizeof(char *) * 30);
+
+    int stkptr = 0;
+
+    char* lo = (char*)base;
+    char* hi = (char*)base + (width * (num - 1));
+
+    unsigned size;
+
+recurse:
+
+    size = (hi - lo) / width + 1;
+
+    if (size <= CUTOFF) {
+
+        data_shortsort(lo, hi, width, n, offset);
+
+    } else {
+
+        char* mid = lo + (size / 2) * width;
+        swap(mid, lo, width);
+
+        char* loguy = lo;
+        char* higuy = hi + width;
+
+        for (;;) {
+            do {
+                loguy += width;
+            } while (loguy <= hi && compareRecord(loguy, lo, n, offset) <= 0);
+            do {
+                higuy -= width;
+            } while (higuy > lo && compareRecord(higuy, lo, n, offset) >= 0);
+            if (higuy < loguy) {
+                break;
+            }
+            swap(loguy, higuy, width);
+        }
+
+        swap(lo, higuy, width);
+
+        if (higuy - 1 - lo >= hi - loguy) {
+            if (lo + width < higuy) {
+                lostk[stkptr] = lo;
+                histk[stkptr] = higuy - width;
+                ++stkptr;
+            }
+
+            if (loguy < hi) {
+                lo = loguy;
+                goto recurse;
+            }
+        } else {
+            if (loguy < hi) {
+                lostk[stkptr] = loguy;
+                histk[stkptr] = hi;
+                ++stkptr;
+            }
+            if (lo + width < higuy) {
+                hi = higuy - width;
+                goto recurse;
+            }
+        }
+
+    }
+
+    --stkptr;
+    if (stkptr >= 0) {
+        lo = lostk[stkptr];
+        hi = histk[stkptr];
+        goto recurse;
+    }
+    free(lostk);
+    free(histk);
+}
+
+
+/* =============================================================================
+ *
+ * End of sort.c
+ *
+ * =============================================================================
+ */
+
+
+
 
 /* =============================================================================
  * data_sort
@@ -363,18 +524,19 @@ data_sort (data_t* dataPtr,
            long num,
            long offset)
 {
+    TM_BEGIN();
     assert(start >= 0 && start <= dataPtr->numRecord);
     assert(num >= 0 && num <= dataPtr->numRecord);
     assert(start + num >= 0 && start + num <= dataPtr->numRecord);
 
     long numVar = dataPtr->numVar;
 
-    sort((dataPtr->records + (start * numVar)),
-          num,
-          numVar,
-          &compareRecord,
-          numVar,
-          offset);
+    data_sort2((dataPtr->records + (start * numVar)),
+	 num,
+	 numVar,
+	 numVar,
+	 offset);
+    TM_END();
 }
 
 
@@ -390,6 +552,7 @@ data_findSplit (data_t* dataPtr, long start, long num, long offset)
     long low = start;
     long high = start + num - 1;
 
+    TM_BEGIN();
     long numVar = dataPtr->numVar;
     char* records = dataPtr->records;
 
@@ -401,6 +564,7 @@ data_findSplit (data_t* dataPtr, long start, long num, long offset)
             high = mid - 1;
         }
     }
+    TM_END();
 
     return (low - start);
 }

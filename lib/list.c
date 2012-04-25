@@ -83,10 +83,6 @@
  */
 
 TM_CALLABLE
-static list_node_t*
-TMfindPrevious (TM_ARGDECL  list_t* listPtr, void* dataPtr);
-
-TM_CALLABLE
 static void
 TMfreeList (TM_ARGDECL  list_node_t* nodePtr, bool_t free_data);
 
@@ -224,7 +220,7 @@ PallocNode (void* dataPtr)
  * -- Returns NULL on failure
  * =============================================================================
  */
-static list_node_t*
+list_node_t*
 TMallocNode (TM_ARGDECL  void* dataPtr)
 {
     list_node_t* nodePtr = (list_node_t*)TM_MALLOC(sizeof(list_node_t));
@@ -537,24 +533,9 @@ findPrevious (list_t* listPtr, void* dataPtr)
  * TMfindPrevious
  * =============================================================================
  */
-static list_node_t*
-TMfindPrevious (TM_ARGDECL  list_t* listPtr, void* dataPtr)
-{
-    list_node_t* prevPtr = &(listPtr->head);
-    list_node_t* nodePtr;
-
-    for (nodePtr = (list_node_t*)TM_SHARED_READ_P(prevPtr->nextPtr);
-         nodePtr != NULL;
-         nodePtr = (list_node_t*)TM_SHARED_READ_P(nodePtr->nextPtr))
-    {
-        if (listPtr->compare(nodePtr->dataPtr, dataPtr) >= 0) {
-            return prevPtr;
-        }
-        prevPtr = nodePtr;
-    }
-
-    return prevPtr;
-}
+TM_CALLABLE
+list_node_t*
+TMfindPrevious (TM_ARGDECL  list_t* listPtr, void* dataPtr);
 
 
 /* =============================================================================

@@ -117,7 +117,7 @@
 
 
 #include <stdio.h>
-
+#include <tm.h>
 
 
 #ifndef MT19937AR_H
@@ -144,29 +144,37 @@ static long mti=N+1; /* mti==N+1 means mt[N] is not initialized */
 #endif
 
 /* initializes mt[N] with a seed */
+TM_CALLABLE
 void init_genrand(unsigned long mt[], unsigned long * mtiPtr, unsigned long s);
 
 /* initialize by an array with array-length */
 /* init_key is the array for initializing keys */
 /* key_length is its length */
 /* slight change for C++, 2004/2/26 */
+TM_CALLABLE
 void init_by_array(unsigned long mt[], unsigned long * mtiPtr, unsigned long init_key[], long key_length);
 
 /* generates a random number on [0,0xffffffff]-interval */
+TM_CALLABLE
 unsigned long genrand_int32(unsigned long mt[], unsigned long * mtiPtr);
 
 /* generates a random number on [0,0x7fffffff]-interval */
+TM_CALLABLE
 long genrand_int31(unsigned long mt[], unsigned long * mtiPtr);
 
 /* generates a random number on [0,1]-real-interval */
+TM_CALLABLE
 double genrand_real1(unsigned long mt[], unsigned long * mtiPtr);
 
 /* generates a random number on [0,1)-real-interval */
+TM_CALLABLE
 double genrand_real2(unsigned long mt[], unsigned long * mtiPtr);
 /* generates a random number on (0,1)-real-interval */
+TM_CALLABLE
 double genrand_real3(unsigned long mt[], unsigned long * mtiPtr);
 
 /* generates a random number on [0,1) with 53-bit resolution*/
+TM_CALLABLE
 double genrand_res53(unsigned long mt[], unsigned long * mtiPtr);
 
 

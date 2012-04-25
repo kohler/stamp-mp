@@ -94,6 +94,7 @@ typedef struct bitmap {
  * -- Returns NULL on failure
  * =============================================================================
  */
+TM_CALLABLE
 bitmap_t*
 bitmap_alloc (long numBit);
 
@@ -111,6 +112,7 @@ Pbitmap_alloc (long numBit);
  * bitmap_free
  * =============================================================================
  */
+TM_CALLABLE
 void
 bitmap_free (bitmap_t* bitmapPtr);
 

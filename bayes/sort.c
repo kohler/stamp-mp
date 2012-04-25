@@ -125,11 +125,12 @@ swap (char* a, char* b, unsigned width)
  * shortsort
  * =============================================================================
  */
-static void
+TM_CALLABLE
+void
 shortsort (char* lo,
            char* hi,
            unsigned width,
-           int (*cmp)(const void* p1, const void* p2, long n, long offset),
+           TM_CALLABLE int (*cmp)(const void* p1, const void* p2, long n, long offset),
            long n,
            long offset)
 {
@@ -155,7 +156,7 @@ void
 sort (void *base,
       unsigned num,
       unsigned width,
-      int (*cmp)(const void* p1, const void* p2, long n, long offset),
+      TM_CALLABLE int (*cmp)(const void* p1, const void* p2, long n, long offset),
       long n,
       long offset)
 {
@@ -163,8 +164,8 @@ sort (void *base,
         return;
     }
 
-    char* lostk[30];
-    char* histk[30];
+    char** lostk = malloc(sizeof(char *) * 30);
+    char** histk = malloc(sizeof(char *) * 30);
 
     int stkptr = 0;
 
@@ -235,6 +236,8 @@ recurse:
         hi = histk[stkptr];
         goto recurse;
     }
+    free(lostk);
+    free(histk);
 }
 
 

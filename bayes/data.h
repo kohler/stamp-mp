@@ -135,6 +135,7 @@ data_copy (data_t* dstPtr, data_t* srcPtr);
  * -- In place
  * =============================================================================
  */
+TM_CALLABLE
 void
 data_sort (data_t* dataPtr,
            long start,
@@ -148,6 +149,7 @@ data_sort (data_t* dataPtr,
  * -- Returns number of zeros in offset column
  * =============================================================================
  */
+TM_CALLABLE
 long
 data_findSplit (data_t* dataPtr, long start, long num, long offset);
 

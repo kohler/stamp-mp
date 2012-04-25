@@ -86,6 +86,7 @@ typedef struct net net_t;
  * net_alloc
  * =============================================================================
  */
+TM_CALLABLE
 net_t*
 net_alloc (long numNode);
 
@@ -94,6 +95,7 @@ net_alloc (long numNode);
  * net_free
  * =============================================================================
  */
+TM_CALLABLE
 void
 net_free (net_t* netPtr);
 
@@ -120,6 +122,7 @@ TMnet_applyOperation (TM_ARGDECL
  * net_hasEdge
  * =============================================================================
  */
+TM_CALLABLE
 bool_t
 net_hasEdge (net_t* netPtr, long fromId, long toId);
 
@@ -137,6 +140,7 @@ TMnet_hasEdge (TM_ARGDECL  net_t* netPtr, long fromId, long toId);
  * net_isPath
  * =============================================================================
  */
+TM_CALLABLE
 bool_t
 net_isPath (net_t* netPtr,
             long fromId,
@@ -163,6 +167,7 @@ TMnet_isPath (TM_ARGDECL
  * net_isCycle
  * =============================================================================
  */
+TM_CALLABLE
 bool_t
 net_isCycle (net_t* netPtr);
 
@@ -180,6 +185,7 @@ net_getParentIdListPtr (net_t* netPtr, long id);
  * net_getChildIdListPtr
  * =============================================================================
  */
+TM_CALLABLE
 list_t*
 net_getChildIdListPtr (net_t* netPtr, long id);
 
@@ -243,6 +249,7 @@ TMnet_findDescendants (TM_ARGDECL
  * net_generateRandomEdges
  * =============================================================================
  */
+TM_CALLABLE
 void
 net_generateRandomEdges (net_t* netPtr,
                          long maxNumParent,

@@ -97,6 +97,10 @@ typedef struct list {
 } list_t;
 
 
+TM_CALLABLE
+list_node_t*
+TMallocNode (TM_ARGDECL  void* dataPtr);
+
 /* =============================================================================
  * list_iter_reset
  * =============================================================================
@@ -175,6 +179,7 @@ Plist_alloc (long (*compare)(const void*, const void*));
  * -- Returns NULL on failure
  * =============================================================================
  */
+TM_CALLABLE
 list_t*
 TMlist_alloc (TM_ARGDECL  long (*compare)(const void*, const void*));
 
@@ -210,6 +215,7 @@ Plist_free (list_t* listPtr);
  * -- Returns NULL on failure
  * =============================================================================
  */
+TM_CALLABLE
 void
 TMlist_free (TM_ARGDECL  list_t* listPtr);
 
@@ -219,6 +225,7 @@ TMlist_free (TM_ARGDECL  list_t* listPtr);
  * -- Returns NULL on failure
  * =============================================================================
  */
+TM_CALLABLE
 void
 TMlist_free_data (TM_ARGDECL  list_t* listPtr);
 
